@@ -1,0 +1,127 @@
+* {
+  font-family: "Jersey 15", sans-serif;
+}
+
+#emailAddress, #password {
+    font-size: 22px;
+}
+
+#login {
+  font-size: 25px;
+}
+
+.background-gradient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 200vh;
+    width: 100vw;
+    background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+    background-size: 200% 200%;
+    animation: gradientMove 15s ease infinite;
+    z-index: -1;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.login-form {
+    width: 100%;
+    max-width: 400px;
+}
+
+.h1-shadow {
+    color: white;
+    text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+    font-size: 5rem;
+}
+
+p {
+    font-size: 18px;
+    color: white;
+}
+
+span {
+    color: white;
+}
+
+a {
+    text-decoration: none;
+}
+
+.custom-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.custom-checkbox .checkmark {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  vertical-align: middle;
+  position: relative;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+}
+
+.custom-checkbox .label-text {
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+.custom-checkbox input[type="checkbox"]:checked + .checkmark {
+  background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  border: none;
+}
+
+.custom-checkbox input[type="checkbox"]:checked + .checkmark::after {
+  content: "✔";
+  color: white;
+  position: absolute;
+  top: 0;
+  left: 5px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.gradient-btn {
+  background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
+  border: none;
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+.gradient-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 576px) {
+  .h1-shadow {
+    font-size: 3rem;
+  }
+
+  #emailAddress, #password {
+    font-size: 18px;
+  }
+
+  #login {
+    font-size: 20px;
+  }
+
+  .custom-checkbox .label-text {
+    font-size: 16px;
+  }
+
+  footer p {
+    font-size: 14px;
+  }
+}
