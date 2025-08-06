@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Jersey+15&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/signup.css">
+    <title>Signup</title>
+</head>
+  <body>
+    <div class="background-gradient"></div>
+    <div class="text-center d-flex align-items-center flex-wrap vh-100">
+        <!-- u sledecem redu ce action da se promeni na onaj path kome je zahtev upucen rest zahtev za signup -->
+        <form class="signup-form mx-auto px-3" action = "../templates/index.html" method="post">
+            <a href="index.html"><img class="mb-4" src="../static/images/logo.png" width="200px" alt = "Logo"></a>
+            <p class="mb-4 fw-normal h1-shadow">Sign up!</p>
+            
+            <div>
+                <label for="emailAddress" class="visually-hidden">Email:</label>
+                <input type="email" id="emailAddress" name = "email" class="form-control" placeholder="E-Mail" required autofocus>
+                <label for="username" class="visually-hidden">Username:</label>
+                <input type="username" id="username" name="username" class="form-control mt-2" placeholder="Username">
+                <label for="password" class="visually-hidden">Password:</label>
+                <input type="password" id="password" name = "password" placeholder="Password" class="form-control mt-2">
+            </div>
+
+            <div class="mt-4 d-grid">
+                <button type = "submit" class="btn btn-lg btn-primary gradient-btn" id="signup">Sign up</button>
+            </div>
+        </form>
+
+        <footer class="w-100 text-center position-absolute bottom-0 mb-2">
+            <p class="m-0" style="font-size: 16px;">© VibeCheck 2025</p>
+        </footer>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+  
+  </body>
+</html>
