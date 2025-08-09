@@ -10,8 +10,6 @@
     align-items: flex-start;
 }
 
-
-
 .header {
     background-color: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
@@ -33,8 +31,6 @@
     align-items: flex-start;
     gap: 0.2vw;
 }
-
-
 
 .nav-link {
     font-family: "Jersey 15", sans-serif;
@@ -67,7 +63,7 @@
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.2);
     white-space: nowrap;
 }
 
@@ -78,9 +74,7 @@ a {
 .playlistlink, .collablink, .collablink:hover {
     color: white;
 }
-
-
-  
+ 
 .dropdown-menu {
     font-family: "Jersey 15", sans-serif;
     font-size: clamp(1rem, 2vw, 1.5rem);
@@ -107,7 +101,6 @@ a {
     z-index: -1;
 }
 
-  
 .sections {
     display: flex;
     gap: 1%;
@@ -138,7 +131,6 @@ a {
     z-index: 0;
 }
 
-
 .friends-text, .collabs-text, .mail-text, .playlist-name, .addfriend{
     font-family: "Jersey 15", sans-serif;
     font-size: clamp(2rem, 3vw, 4rem);
@@ -153,13 +145,11 @@ a {
     color: transparent;
     -webkit-text-fill-color: transparent;
 
-    text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.2);
     margin: 0;
     white-space: nowrap;
 
 }
-
-
 
 .friends-list, .collabs-list, .mail-list{
     color: white;
@@ -171,8 +161,6 @@ a {
 .collabs-list{
     text-align: left;
 }
-
-
 
 .new_friend, .new_collab, .new_request, .submit, .submitname{
     margin-top: 20px;
@@ -193,7 +181,6 @@ a {
     font-size: clamp(1rem, 2vw, 2.5rem);
 }
 
-
 .addfriend, .addfriend:hover {
     background-color: transparent;
     height: fit-content;
@@ -207,15 +194,15 @@ a {
     margin-top: 0.5vw;
 }
 
-
 .requests{
     margin-bottom: 3px;
 }
 
 .image {
     margin-top: 5vw;
-    width: clamp(13rem, 15vw, 16rem);
-    height: clamp(13rem, 15vw, 16rem);
+    margin-bottom: 2vw;
+    width: clamp(6rem, 15vw, 10rem);
+    height: clamp(6rem, 15vw, 10rem);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     flex-shrink: 0;
 }
@@ -227,8 +214,6 @@ a {
     font-family: "Jersey 15", sans-serif;
     font-size: clamp(1rem, 1.5vw, 2rem);
 }
-
-
 
 .form, .nameform{
     display: flex;

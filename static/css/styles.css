@@ -5,7 +5,7 @@ body, html {
 }
 
 .scroll-container {
-    height: 400vh;
+    height: 300vh;
 }
 
 .background-gradient {
@@ -61,6 +61,22 @@ body, html {
 
     text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
     margin: 0;
+    white-space: nowrap;
+}
+
+.vibe-text-unsized {
+    font-family: "Jersey 15", sans-serif;
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+    
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
+    margin: 0 0 2rem 0;
     white-space: nowrap;
 }
 

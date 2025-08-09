@@ -1,0 +1,149 @@
+.w70 {
+    width: 70%;
+}
+
+.mali-logo {
+    width: 80px;
+}
+
+.pixel-text {
+    font-family: "Jersey 15", sans-serif;
+}
+
+.btn-text {
+    font-family: "Jersey 15", sans-serif;
+    font-size: 24px;
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+}
+
+.small-text {
+    font-size: 24px;
+}
+
+.big-text {
+    font-size: 3rem;
+}
+
+.compare-plans {
+    font-size: clamp(3rem, 10vw, 5rem);
+}
+
+.gradient-header {
+    background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    color: white;
+    border-bottom: none;
+}
+
+.small-vibe, .small-check {
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 8vw, 4rem);
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+    
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.vibe-text {
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(6rem, 12vw, 8rem);
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+    
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.vibe-text-compare {
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(3.5rem, 8vw, 6rem);
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+    
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.enjoy-text {
+    font-family: "Jersey 15", sans-serif;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.gradient-btn {
+    background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    border: none;
+    color: white;
+    transition: transform 0.2s ease;
+}
+
+.gradient-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.btn-outline-primary {
+    --bs-btn-border-color: #6c757d;
+    --bs-btn-color: transparent;
+    --bs-btn-bg: transparent;
+    --bs-btn-hover-bg: transparent; 
+    --bs-btn-hover-border-color: #6c757d;
+    --bs-btn-hover-color: transparent;
+    --bs-btn-active-bg: transparent;
+    --bs-btn-active-border-color: #6c757d;
+    --bs-btn-active-color: transparent;
+    --bs-btn-focus-shadow-rgb: 108, 117, 125;
+    transition: transform 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+    .w70 {
+        width: 95%;
+    }
+    
+    .small-text {
+        font-size: 20px;
+    }
+    
+    .btn-text {
+        font-size: 20px;
+    }
+}
