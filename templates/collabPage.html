@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Spotify Collab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+15&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+
+    <link href = "../static/css/CollabPage.css" rel = "stylesheet">
+</head>
+
+<body>
+    <div class="collab-container">
+        <header class="top-bar">
+            <div class="top-left">
+                <a href="/"><img class="imgLogo" src="../static/images/logo.png" alt="Logo" /></a>
+                <span class="small-vibe">Vibe</span>
+                <span class="small-check">Check</span>
+            </div>
+            <div class="top-right-buttons">
+                <button class="btn premium-btn" id="premium-btn">
+                    <img class="imgCrown" src="../static/images/crown.png" alt="Premium" />
+                    Premium
+                </button>
+            </div>
+        </header>
+
+        <div class="main-wrapper">
+            <main class="main-content">
+                <header class="collab-header">
+                    <div>
+                        <h1 class="highlight" id="collab-name">VibeCheckCollab</h1>
+                        <p>Users: Dusan, Masa, Nikola</p>
+                    </div>
+                    <div>
+                        <p>Playlist: <span id="playlist-count">0</span> songs</p>
+                        <label>Current User:
+                            <select id="user-select">
+                                <option>Dusan</option>
+                                <option>Masa</option>
+                                <option>Nikola</option>
+                            </select>
+                        </label>
+                    </div>
+                </header>
+
+                <div class="sections">
+                    <section class="playlist-section">
+                        <h2>Current playlist</h2>
+                        <ul id="playlist"></ul>
+                    </section>
+
+                    <section class="search-section">
+                        <h2>Search Spotify</h2>
+                        <div class="search-bar">
+                            <div class="searchdiv">
+                                <input id="search-input" class="searchinput" placeholder="Search Spotify..."
+                                    autocomplete="off" />
+                                <span id="search-status"></span>
+                            </div>
+                            <ul id="search-results" class="search-suggestions"></ul>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../static/js/collabPage.js"></script>
+</body>
+
+</html>
