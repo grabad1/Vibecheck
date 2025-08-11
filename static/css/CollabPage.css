@@ -603,7 +603,7 @@ html, body {
 @media (max-width: 900px) {
   .sections {
     flex-direction: column;
-    gap: 2rem; /* razmak između plejlista i search sekcije */
+    gap: 2rem; 
   }
 
   .playlist-section,
@@ -613,3 +613,9 @@ html, body {
   }
 }
 
+.playlist-section h2, .search-section h2, #collab-name {
+   font-family: "Jersey 15", sans-serif;
+}
+#collab-name{
+  font-size: 5rem;
+}
