@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trending Playlists</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+15&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../static/css/CollabPage.css">
+    <link rel="stylesheet" href="../static/css/trending.css">
+</head>
+
+<body>
+    <div class="collab-container">
+        <header class="top-bar">
+            <div class="top-left">
+                <a href="/"><img class="imgLogo" src="../static/images/logo.png" alt="Logo" /></a>
+                <span class="small-vibe">VibeCheck</span>
+            </div>
+            <div class="top-right-buttons">
+                <button class="btn premium-btn" id="premium-btn">
+                    <img class="imgCrown" src="../static/images/crown.png" alt="Premium" />
+                    Premium
+                </button>
+            </div>
+        </header>
+
+        <header class="collab-header">
+            <h1 class="highlight" id="collab-name">Trending</h1>
+            <p id="scroll-text">&#x21E3;&#x21E3;Scroll down &#x21E3;&#x21E3;</p> 
+        </header>
+        <div class="main-wrapper">
+            <main class="main-content">
+
+                <div class="sections">
+                    <section class="search-section">
+                        <ul id="trending-list" class="playlist-grid"></ul>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="../static/js/trending.js"></script>
+</body>
+
+</html>
