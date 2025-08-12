@@ -1,3 +1,31 @@
+
+// animcije za fade out
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.timeline({
+    scrollTrigger: {
+        start: "top top",
+        end: "35% top",
+        scrub: true,
+    }
+})
+.to(".vibe-text", {
+    opacity: 0,
+    duration: 1,
+    ease: "power2.out"
+});
+
+gsap.to(".scroll-indicator", {
+    opacity: 0,
+    scrollTrigger: {
+        start: "top top",
+        end: "10% top",
+        scrub: true,
+    }
+});
+
+// ----------------------------
+
 let savedData = [
     {
         id: 1,
@@ -89,25 +117,25 @@ function renderTrending() {
         card.className = "playlist-card";
 
         card.innerHTML = `
-    <img src="${pl.image}" alt="cover">
-    <div class="playlist-info">
-        <h3>${pl.name}</h3>
-        <p>By ${pl.author}</p>
-        <p>Added: ${pl.dateAdded}</p>
-    </div>
-    <div class="playlist-actions">
-        <button class="like-btn ${userLikes[pl.id] ? 'liked' : ''}" 
-                aria-pressed="${userLikes[pl.id] ? 'true' : 'false'}" 
-                style="opacity: ${userLikes[pl.id] ? 1 : 0.4};">
-            ❤️ ${pl.likes}
-        </button>
-        <div class="rating-display" tabindex="0" aria-label="Ocena plejlistu" data-playlist-id="${pl.id}" 
-             style="opacity: ${userRatings[pl.id] ? 1 : 0.4};">
-            <span class="star-icon">⭐</span>
-            <span class="rating-value">${userRatings[pl.id] ? userRatings[pl.id].toFixed(1) : "N/A"}</span>
-        </div>
-    </div>
-`;
+            <img src="${pl.image}" alt="cover">
+            <div class="playlist-info">
+                <h3>${pl.name}</h3>
+                <p>By ${pl.author}</p>
+                <p>Added: ${pl.dateAdded}</p>
+            </div>
+            <div class="playlist-actions">
+                <button class="like-btn ${userLikes[pl.id] ? 'liked' : ''}" 
+                        aria-pressed="${userLikes[pl.id] ? 'true' : 'false'}" 
+                        style="opacity: ${userLikes[pl.id] ? 1 : 0.4};">
+                    ❤️ ${pl.likes}
+                </button>
+                <div class="rating-display" tabindex="0" aria-label="Ocena plejlistu" data-playlist-id="${pl.id}" 
+                    style="opacity: ${userRatings[pl.id] ? 1 : 0.4};">
+                    <span class="star-icon">⭐</span>
+                    <span class="rating-value">${userRatings[pl.id] ? userRatings[pl.id].toFixed(1) : "N/A"}</span>
+                </div>
+            </div>
+        `;
 
         card.querySelector(".like-btn").addEventListener("click", () => {
             const liked = userLikes[pl.id] || false;
@@ -145,8 +173,8 @@ const ratingModalHTML = `
       <div class="rating-stars">
         ${Array.from({ length: 10 }, (_, i) => `<span class="star" data-value="${i + 1}" aria-label="${i + 1} zvezdica" role="button" tabindex="0">☆</span>`).join('')}
       </div>
-      <button id="cancel-rating-btn" aria-label="Cancel your rating">Cancel your rating</button>
-      <button id="rating-modal-close" aria-label="Zatvori modal">X</button>
+      <button id="cancel-rating-btn" aria-label="Remove your rating">Remove your rating</button>
+      <button id="rating-modal-close" aria-label="Zatvori modal">x</button>
     </div>
   </div>
 `;
