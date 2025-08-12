@@ -35,6 +35,8 @@ loginForm.addEventListener("submit", (e) => {
 
     if (username && password && username === "admin" && password === "123") {
         navigateToPage("../templates/admin.html");
+    } else if (username && password && username === "moderator" && password === "123"){
+        navigateToPage("../templates/moderator.html");
     } else {
         navigateToPage("../templates/user.html");
     }
