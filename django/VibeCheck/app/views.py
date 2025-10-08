@@ -1,5 +1,8 @@
-from django.shortcuts import render
-
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User as djangoUser
+from django.shortcuts import render, redirect
+from .models import *
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
@@ -16,8 +19,28 @@ def collabPage(request):
 def createCollab(request):
     return render(request, 'createCollab.html')
 
-def login(request):
-    return render(request, 'login.html')
+def loginuser(request):
+    if request.user.is_authenticated:
+        return redirect('user')
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        try:
+            user = djangoUser.objects.get(username=username)
+        except:
+            mess = "Ne postoji korisnik"
+            context = {'mess': mess}
+            return render(request, 'login.html', context)
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('user')
+        else:
+            mess = "Neisparvna lozinka"
+            context = {'mess': mess}
+            return render(request, 'login.html', context)
+    else:
+        return render(request, 'login.html')
 
 def moderator(request):
     return render(request, 'moderator.html')
@@ -25,7 +48,8 @@ def moderator(request):
 def passwordChange(request):
     return render(request, 'passwordChange.html')
 
-def playlist(request):
+def playlist(request, idplaylist):
+    playlist = Playlist.objects.get(idplaylist=idplaylist)
     return render(request, 'playlist.html')
 
 def playlistView(request):
@@ -47,4 +71,6 @@ def trending(request):
     return render(request, 'trending.html')
 
 def user(request):
-    return render(request, 'user.html')
+    user = request.user
+    collabs = Collab.objects.filter(iduser=1)
+    return render(request, 'user.html', context={'collabs':collabs, 'username': user.username})
