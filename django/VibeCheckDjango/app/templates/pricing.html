@@ -1,0 +1,163 @@
+<!--Nikola Simikić-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Jersey+15&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/pricing.css">
+    <title>Pricing</title>
+</head>
+<body>
+    <div class="container py-3">
+        <header>
+            <div class="d-flex flex-column flex-md-row align-items-center pb-3border-bottom">
+                <a href="../templates/index.html" class="d-flex align-items-center link-body-emphasis text-decoration-none">
+                    <img src="../static/images/logo.png" class="mali-logo" alt="Logo">
+                    <span class="small-vibe">Vibe</span><span class="small-check">Check</span>
+                </a>
+            </div>
+            
+            <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+                <h1 class="display-4 fw-normal text-body-emphasis vibe-text">Pricing</h1>
+                <p class="fs-3 text-body-secondary mb-4 enjoy-text">
+                    Enjoy incredible benefits by upgrading to VibeCheck Premium monthly plan!
+                </p>
+            </div>
+        </header>
+        
+        <main>
+            <div class="row mb-3 text-center justify-content-center">
+                <!-- Free Plan -->
+                <div class="col-12 col-sm-8 col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h2 class="my-0 fw-normal text-body-secondary pixel-text">Free</h2>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title pricing-card-title pixel-text big-text">
+                                $0<small class="text-body-secondary">/mo</small>
+                            </h1>
+                            <ul class="list-unstyled mt-3 mb-4 pixel-text small-text flex-grow-1">
+                                <li>5 collabs available</li>
+                                <li>Add at most 3 friends</li>
+                                <li>Add 10 songs per collab</li>
+                                <li>Relatively short playlists</li>
+                            </ul>
+                            <button type="button" class="w-100 btn btn-lg btn-outline-primary pixel-text btn-text mt-auto" onclick="location.href='signup.html'">
+                                Sign up
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Premium Plan -->
+                <div class="col-12 col-sm-8 col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 rounded-3 shadow-sm">
+                        <div class="card-header py-3 gradient-header">
+                            <h2 class="my-0 fw-normal pixel-text">Premium</h2>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title pricing-card-title pixel-text big-text">
+                                $5<small class="text-body-secondary">/mo</small>
+                            </h1>
+                            <ul class="list-unstyled mt-3 mb-4 pixel-text small-text flex-grow-1">
+                                <li>Unlimited collabs available</li>
+                                <li>Add as many friends as you want</li>
+                                <li>Add unlimited number of songs</li>
+                                <li>Sky is the limit!</li>
+                            </ul>
+                            <button type="button" class="w-100 btn btn-lg btn-primary pixel-text small-text gradient-btn mt-auto" onclick="location.href='checkout.html'">
+                                Get started
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-center mb-4 vibe-text-compare">Compare plans</p>
+            
+            <div class="table-responsive mx-auto w70">
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th style="width: 34%;"></th>
+                            <th style="width: 22%;" class="pixel-text fs-5">Free</th>
+                            <th style="width: 22%;" class="pixel-text fs-5">Premium</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="text-start pixel-text fs-5">Trending</th>
+                            <td>
+                                <svg class="bi" width="24" height="24" role="img" aria-label="Included">
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </td>
+                            <td>
+                                <svg class="bi" width="24" height="24" role="img" aria-label="Included">
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-start pixel-text fs-5">Private collabs</th>
+                            <td>
+                                <svg class="bi" width="24" height="24" role="img" aria-label="Included">
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </td>
+                            <td>
+                                <svg class="bi" width="24" height="24" role="img" aria-label="Included">
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="text-start pixel-text fs-5">Unlimited collabs</th>
+                            <td></td>
+                            <td>
+                                <svg class="bi" width="24" height="24" role="img" aria-label="Included">
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-start pixel-text fs-5">Unlimited collab songs</th>
+                            <td></td>
+                            <td>
+                                <svg class="bi" width="24" height="24" role="img" aria-label="Included">
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-start pixel-text fs-5">Unlimited collab members</th>
+                            <td></td>
+                            <td>
+                                <svg class="bi" width="24" height="24" role="img" aria-label="Included">
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check" viewBox="0 0 16 16">
+            <title>Check</title>
+            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+        </symbol>
+    </svg>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+</body>
+</html>

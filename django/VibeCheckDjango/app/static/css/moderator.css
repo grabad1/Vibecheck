@@ -1,0 +1,130 @@
+.bi {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+}
+
+@media (min-width: 768px) {
+    .sidebar .offcanvas-lg {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 48px;
+    }
+    .navbar-search {
+    display: block;
+    }
+}
+
+.container-fluid > .row {
+    height: 100%;
+}
+
+.sidebar .nav-link {
+    font-size: .875rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.sidebar .nav-link.active {
+    color: #2470dc;
+}
+
+.sidebar-heading {
+    font-size: .75rem;
+}
+
+.navbar-brand {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+}
+
+.navbar .form-control {
+    padding: .75rem 1rem;
+}
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+    }
+}
+
+.bi {
+    vertical-align: -0.125em;
+    fill: currentColor;
+}
+
+.section-content {
+    display: none;
+}
+
+.section-content.active {
+    display: block;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+}
+
+.action-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.card {
+    height: auto;
+}
+
+.row.mb-4 {
+    height: auto;
+}
+
+a, a:hover {
+    text-decoration: none;
+    color:currentColor;
+}
+
+.song {
+    gap: 0.3vw;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: clamp(0.4rem, 1vw, 1.5rem);
+    width: 30vw;
+    margin-bottom: 1vw;
+    align-items: center;
+}
+
+.song-img {
+    width: clamp(2rem, 3vw, 4rem);
+    height: clamp(2rem, 3vw, 4rem);
+}
+
+.song-name, .singer {
+    color: rgb(56, 55, 55);
+    font-size: clamp(1rem, 1.5vw, 2rem);
+}
+
+
+.time {
+    color: rgb(56, 55, 55);
+    font-size: clamp(1rem, 1.5vw, 2rem);
+    align-self: center;
+}
+
+.remove {
+    font-size: clamp(1rem, 1.5vw, 2rem);
+}
+
+.playlist-name {
+    font-size: clamp(1.5rem, 2vw, 2.5rem);
+    color: rgb(56, 55, 55);
+    font-weight: bold;
+}
