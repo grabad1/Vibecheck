@@ -33,16 +33,12 @@
                 <header class="collab-header">
                     <div>
                         <h1 id="collab-name">{{ collab.name }}</h1>
-                        <p>Users: Dusan, Masa, Nikola</p>
+                        <p>Users: {% for u in users %}{{ u.idauth.username}}, {% endfor %}</p>
                     </div>
                     <div>
                         <p>Playlist: <span id="playlist-count">0</span> songs</p>
                         <label>Current User:
-                            <select id="user-select">
-                                <option>Dusan</option>
-                                <option>Masa</option>
-                                <option>Nikola</option>
-                            </select>
+                            {{request.user.username}}
                         </label>
                     </div>
                 </header>

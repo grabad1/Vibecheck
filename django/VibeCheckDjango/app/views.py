@@ -112,14 +112,17 @@ def user(request):
 def collabPage(request, id):
     collab=Collab.objects.get(idcollab=id)
     pesme = Contains.objects.filter(idplaylist=collab.idplaylist)
+    users = []
+    for j in Participated.objects.filter(idcollab=collab):
+        users.append(j.iduser)
     playlist = []
     for i in pesme:
         playlist.append({
             'song': i.idsong,
-            'user': i.iduser.idauth
+            'user': i.iduser.idauth,
         })
         print(i.idsong.name)
-    return render(request, 'collabPage.html',{'collab':collab, 'playlist':playlist})
+    return render(request, 'collabPage.html',{'collab':collab, 'playlist':playlist,'users': users})
 
 
 import requests
