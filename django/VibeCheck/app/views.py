@@ -20,6 +20,16 @@ def index(request):
 
 
 def checkout(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = User.objects.get(idauth=request.user.id)
+            Purchased.objects.create(iduser=user, date=datetime.now())
+            user.type = "premium"
+            user.save()
+            return redirect('successful_payment')
+        else:
+            context = {"mess" : "Error: Purchase failed!"}
+            return render('checkout', context)
     return render(request, 'checkout.html')
 
 
@@ -447,6 +457,11 @@ def playlistView(request):
 
 
 def pricing(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            return redirect('checkout')
+        else:
+            return redirect('loginuser')
     return render(request, 'pricing.html')
 
 
