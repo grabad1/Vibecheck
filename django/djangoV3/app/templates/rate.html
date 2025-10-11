@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rate {{ playlist.idplaylist.name }}</title>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+
+    .rating-stars {
+      font-size: 40px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .star {
+      color: gold;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+
+    .star.selected {
+      opacity: 1;
+    }
+
+    button {
+      margin-top: 20px;
+      background: #1db954;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .cancel{
+        background: #ff0000;
+    }
+    .info{
+      color: #fff65a;
+
+    }
+  </style>
+</head>
+<body>
+
+    <a href="{% url 'trending' %}"
+     style="position: fixed; top: 20px; right: 20px; font-size: 30px; color: white; text-decoration: none; z-index: 1000;">
+    ✖
+  </a>
+
+
+  <h1>Rate playlist: {{ playlist.idplaylist.name }}</h1>
+
+  <form method="POST" id="rating-form">
+    {% csrf_token %}
+    <input type="hidden" name="rating" id="rating-input">
+    <div class="rating-stars" id="stars-container">
+      {% for i in "1234567890" %}
+        <span class="star" data-value="{{ forloop.counter }}">⭐</span>
+      {% endfor %}
+    </div>
+    <button type="submit">Submit</button>
+
+  </form>
+  {% if rated %}
+    <form method="post" action="{% url 'cancelrate' id  %}">
+        {% csrf_token %}
+        <button class="cancel" type="submit">Cancel your rating</button>
+    </form>
+      <p class="info">Your current rating is {{ rating }}</p>
+  {% endif %}
+  <script>
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating-input');
+    let currentRating = 0;
+
+    function highlightStars(rating) {
+      stars.forEach(star => {
+        const val = Number(star.dataset.value);
+        star.classList.toggle('selected', val <= rating);
+      });
+    }
+
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        currentRating = Number(star.dataset.value);
+        ratingInput.value = currentRating;
+        highlightStars(currentRating);
+      });
+
+      star.addEventListener('mouseenter', () => {
+        highlightStars(Number(star.dataset.value));
+      });
+
+      star.addEventListener('mouseleave', () => {
+        highlightStars(currentRating);
+      });
+    });
+  </script>
+</body>
+</html>

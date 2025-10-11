@@ -1,0 +1,67 @@
+<!--Nikola Simikić-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Jersey+15&display=swap" rel="stylesheet">
+    <title>VibeCheck</title>
+
+    <!-- BOOTSTRAP CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+    <div class="background-gradient"></div> 
+    <div class="scroll-container">
+        <div class="content-container">
+            <div class="vibe-container">
+                <h1 class="vibe-text vibe-left">Vibe</h1>
+                <div class="record-container">
+                    <a href="{% url 'trending' %}" class="record-link">
+                        <div class="rotating-wrapper">
+                            <img src="../static/images/record.png" alt="Spinning Record" class="record-base">
+                            <img src="../static/images/miach.jpg" alt="Song Cover" class="record-label">
+                            <div class="record-caption">
+                                <span>Check Trending</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>                  
+                <h1 class="vibe-text vibe-right">Check</h1>
+            </div>
+        </div>
+
+        <div class="top-bar">
+            <div class="top-left">
+                <a href="{% url 'index' %}"><img src="../static/images/logo.png" alt="Vibe Check Logo" class="brand-logo"></a>
+                <span class="small-vibe">Vibe</span>
+                <span class="small-check">Check</span>
+            </div>
+            <div class="top-right-buttons">
+                <button class="btn trending-btn" onclick="location.href='{% url 'trending' %}'">Trending</button>
+                <button class="btn login-btn" onclick="location.href='{% url 'loginuser' %}'">Login</button>
+                <button class="btn premium-btn" onclick="location.href='{% url 'pricing' %}'"><img src="../static/images/crown.png"> Premium</button>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">Scroll Down ↓</div>
+
+        <div class="unleash-the-beat-section">
+            <h2 class="unleash-the-beat-title">Unleash the beat!</h2>
+            <button class="get-started-btn" style="cursor: default;" onclick="location.href='{% url 'loginuser' %}'" disabled>Get started</button>
+        </div>
+    </div>
+
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    
+    <script src="../static/js/index.js"></script>
+</body>
+</html>

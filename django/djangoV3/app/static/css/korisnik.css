@@ -1,0 +1,297 @@
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.logo {
+    width: clamp(5rem, 7vw, 8rem);
+    height: clamp(5rem, 7vw, 8rem);
+    align-items: flex-start;
+}
+
+.header {
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); 
+    margin-bottom: 10px;
+}
+
+
+.items {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 2vw;
+}
+
+.name {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0.2vw;
+}
+
+.nav-link {
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 3vw, 3.5rem);
+    color: white;
+}
+
+.nav-link:hover, .playlistlink:hover {
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+
+}
+
+.vibecheck {
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(4rem, 5vw, 5rem);
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+a {
+    text-decoration: none;
+}
+
+.playlistlink, .collablink, .collablink:hover {
+    color: white;
+}
+ 
+.dropdown-menu {
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    text-align: center;
+    position: absolute;
+    z-index: 2000;
+}
+
+.btn:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.background-gradient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 200vh;
+    width: 100vw;
+    background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+    background-size: 200% 200%;
+    animation: gradientMove 20s ease infinite;
+    z-index: -1;
+}
+
+.sections {
+    display: flex;
+    gap: 1%;
+    height: 150vh; 
+  }
+  
+.friends-bubble, .mail {
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    align-items: center; 
+}
+  
+.collabs {
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    align-items: center; 
+    height: 100%; 
+    width: 31%;
+    position: relative;
+    z-index: 0;
+}
+
+.friends-text, .collabs-text, .mail-text, .playlist-name, .addfriend{
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 3vw, 4rem);
+    text-align: center;
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    background-color: rgba(255, 255, 255, 0.1);
+    animation: gradientMove 12s linear infinite reverse;
+    
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    white-space: nowrap;
+
+}
+
+.friends-list, .collabs-list, .mail-list{
+    color: white;
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 2.5vw, 3rem);
+    text-align: center;
+}
+
+.collabs-list{
+    text-align: left;
+}
+
+.new_friend, .new_collab, .new_request, .submit, .submitname{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 2.5vw, 3rem);
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
+    font-size: clamp(1rem, 2vw, 2.5rem);
+}
+
+.exit{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(1rem, 1.5vw, 2rem);
+    background: transparent;
+
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3)
+    border: none;
+    border-radius: 15px;
+}
+
+.addfriend, .addfriend:hover {
+    background-color: transparent;
+    height: fit-content;
+    transform: none;
+    box-shadow: none;
+    line-height: 1;
+}
+
+.submitname {
+    font-size: clamp(0.7rem, 1.5vw, 2rem);
+    margin-top: 0.5vw;
+}
+
+.requests{
+    margin-bottom: 3px;
+}
+
+.image {
+    margin-top: 5vw;
+    margin-bottom: 2vw;
+    width: clamp(6rem, 15vw, 10rem);
+    height: clamp(6rem, 15vw, 10rem);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    flex-shrink: 0;
+}
+
+.input {
+    margin-bottom: 1vw;
+    border-radius: 10px;
+    height: 3vw;
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(1rem, 1.5vw, 2rem);
+}
+
+.form, .nameform{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2vw;
+}
+
+.nameform {
+    margin-top: 0.5vw;
+    gap: 1vw;
+}
+
+.submit {
+    font-size: clamp(1.5rem, 2vw, 3rem);
+}
+
+
+.song {
+    gap: 1vw;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: clamp(0.4rem, 1vw, 1.5rem);
+    width: 50vw;
+    margin-bottom: 1vw;
+    align-items: center;
+}
+
+.song-img {
+    width: clamp(4rem, 5vw, 6rem);
+    height: clamp(4rem, 5vw, 6rem);
+}
+
+.song-name, .singer {
+    color: white;
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 3vw, 4rem);
+}
+
+
+.time {
+    color: rgb(56, 55, 55);
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 2.5vw, 3em);
+    align-self: center;
+}
+
+.added {
+    color: rgb(56, 55, 55);
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(1.5rem, 2.5vw, 3rem);
+    align-self: center;
+    justify-content: center;
+}
+
+.collab {
+    width: 70%;
+}
+
+.collabin {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-size: clamp(2rem, 3vw, 4rem);
+    padding-bottom: 2vw;
+    padding-top: 2vw;
+}
+
+.collabin::placeholder {
+    color: white;
+}
