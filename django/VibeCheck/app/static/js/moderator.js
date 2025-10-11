@@ -3,10 +3,12 @@ const sectionTitles = {
     'home': 'Dashboard',
     'trending': 'Edit trending',
     'createPlaylist': 'Create Playlist',
-    'myPlaylists': 'My Playlists',
-    'stats' : 'Stats'
+    'myPlaylists': 'My Playlists'
 };
-
+document.addEventListener("DOMContentLoaded", function() {
+    const activeSection = window.ACTIVE_SECTION || 'home';
+    showSection(activeSection);
+});
 function showSection(sectionName) {
     const allSections = document.querySelectorAll('.section-content');
     allSections.forEach(section => {
@@ -34,6 +36,3 @@ function showSection(sectionName) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    showSection('home');
-});

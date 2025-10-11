@@ -181,6 +181,18 @@ a {
     font-size: clamp(1rem, 2vw, 2.5rem);
 }
 
+.exit{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(1rem, 1.5vw, 2rem);
+    background: transparent;
+
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3)
+    border: none;
+    border-radius: 15px;
+}
+
 .addfriend, .addfriend:hover {
     background-color: transparent;
     height: fit-content;

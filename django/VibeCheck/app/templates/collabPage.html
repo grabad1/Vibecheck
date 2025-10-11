@@ -1,5 +1,6 @@
 <!--Dušan Grabović-->
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 
 <head>
@@ -12,36 +13,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <link href = "../static/css/collabPage.css" rel = "stylesheet">
+    <link href = "{% static 'css/CollabPage.css' %}" rel = "stylesheet">
 </head>
 
-<body>
+<body data-collab-id="{{ collab.idcollab }}">
+
     <div class="collab-container">
         <header class="top-bar">
             <div class="top-left">
-                <a href="../templates/index.html"><img class="imgLogo" src="../static/images/logo.png" alt="Logo" /></a>
-                <a href="../templates/index.html" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
+                {% if status != True %}
+                <a href="{% url 'index' %}"><img class="imgLogo" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
+                <a href="{% url 'index' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
+                {%else%}
+                <a href="{% url 'moderator' %}"><img class="imgLogo" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
+                <a href="{% url 'moderator' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
+                {% endif %}
             </div>
+            {% if status != True %}
             <div class="top-right-buttons">
-                <button class="btn premium-btn" onclick="location.href='../templates/pricing.html'"><img src="../static/images/crown.png"> Premium</button>
+                <button class="btn premium-btn" onclick="location.href='../templates/pricing.html'"><img src="{% static 'images/crown.png' %}"> Premium</button>
             </div>
+            {% endif %}
         </header>
 
         <div class="main-wrapper">
             <main class="main-content">
                 <header class="collab-header">
                     <div>
-                        <h1 id="collab-name">VibeCheckCollab</h1>
-                        <p>Users: Dusan, Masa, Nikola</p>
+                        <h1 id="collab-name">{{ collab.name }} </h1>
+                        {% if status != True %}<p>Users: {% for u in users %}{{ u.idauth.username}}, {% endfor %}</p>{%endif%}
                     </div>
                     <div>
                         <p>Playlist: <span id="playlist-count">0</span> songs</p>
                         <label>Current User:
-                            <select id="user-select">
-                                <option>Dusan</option>
-                                <option>Masa</option>
-                                <option>Nikola</option>
-                            </select>
+                            {{request.user.username}}
                         </label>
                     </div>
                 </header>
@@ -49,7 +54,33 @@
                 <div class="sections">
                     <section class="playlist-section">
                         <h2>Current playlist</h2>
-                        <ul id="playlist"></ul>
+                        <ul id="playlist">
+                            {% if playlist %}
+                                {% for item in playlist %}
+                                    <li class="playlist-item">
+                                        <a href="{{ item.song.link }}" target="_blank" rel="noreferrer" class="item-link-a">
+                                            <img src="{{ item.song.imagelink }}" alt="cover" style="width:50px; height:50px;">
+                                            <div style="display:inline-block; margin-left:10px;">
+                                                <strong>{{ item.song.name }}</strong>
+                                                <p>{{ item.song.artist }} • {{ item.song.duration }}</p>
+                                                <small>Added: {{ item.user.username }}</small>
+                                            </div>
+                                        </a>
+                                        {% if request.user == item.user %}
+                                        <div>
+                                            <form method="POST" action="{% url 'remove_track' collab.idcollab item.song.idsong  %}">
+                                                 {% csrf_token %}
+                                                <button type="submit" class="remove-btn">Remove</button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <p>Empty — You can add songs from search.</p>
+                            {% endif %}
+
+                        </ul>
                     </section>
 
                     <section class="search-section">
@@ -70,7 +101,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 
-    <script src="../static/js/collabPage.js"></script>
+    <script src="{% static 'js/collabPage.js' %}"></script>
 </body>
 
 </html>

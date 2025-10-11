@@ -128,3 +128,27 @@ a, a:hover {
     color: rgb(56, 55, 55);
     font-weight: bold;
 }
+.new_collab {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: "Jersey 15", sans-serif;
+    font-size: clamp(2rem, 2.5vw, 3rem);
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+    animation: gradientMove 12s linear infinite reverse;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
+    font-size: clamp(1rem, 1.5vw, 2rem);
+}
+
+.collabin{
+    background-color: rgba(0, 0, 0, 0.1);
+    font-size: clamp(1rem, 1.5vw, 2rem);
+    margin-bottom: 10px;
+}

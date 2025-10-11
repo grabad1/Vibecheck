@@ -21,7 +21,7 @@
             <div class="vibe-container">
                 <h1 class="vibe-text vibe-left">Vibe</h1>
                 <div class="record-container">
-                    <a href="../templates/trending.html" class="record-link">
+                    <a href="{% url 'trending' %}" class="record-link">
                         <div class="rotating-wrapper">
                             <img src="../static/images/record.png" alt="Spinning Record" class="record-base">
                             <img src="../static/images/miach.jpg" alt="Song Cover" class="record-label">
@@ -37,14 +37,14 @@
 
         <div class="top-bar">
             <div class="top-left">
-                <a href="../templates/index.html"><img src="../static/images/logo.png" alt="Vibe Check Logo" class="brand-logo"></a>
+                <a href="{% url 'index' %}"><img src="../static/images/logo.png" alt="Vibe Check Logo" class="brand-logo"></a>
                 <span class="small-vibe">Vibe</span>
                 <span class="small-check">Check</span>
             </div>
             <div class="top-right-buttons">
-                <button class="btn trending-btn" onclick="location.href='../templates/trending.html'">Trending</button>
+                <button class="btn trending-btn" onclick="location.href='{% url 'trending' %}'">Trending</button>
                 <button class="btn login-btn" onclick="location.href='{% url 'loginuser' %}'">Login</button>
-                <button class="btn premium-btn" onclick="location.href='../templates/pricing.html'"><img src="../static/images/crown.png"> Premium</button>
+                <button class="btn premium-btn" onclick="location.href='{% url 'pricing' %}'"><img src="../static/images/crown.png"> Premium</button>
             </div>
         </div>
 
@@ -52,7 +52,7 @@
 
         <div class="unleash-the-beat-section">
             <h2 class="unleash-the-beat-title">Unleash the beat!</h2>
-            <button class="get-started-btn" style="cursor: default;" onclick="location.href='../templates/login.html'" disabled>Get started</button>
+            <button class="get-started-btn" style="cursor: default;" onclick="location.href='{% url 'loginuser' %}'" disabled>Get started</button>
         </div>
     </div>
 

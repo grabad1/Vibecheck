@@ -1,9 +1,10 @@
 <!--Maša Cvetanovski-->
 <html lang="en">
+{% load static %}
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Administrator Page</title>
+        <title>Moderator Page</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="../static/css/moderator.css" rel="stylesheet" />
     </head>
@@ -39,7 +40,7 @@
             </symbol>
         </svg>
         <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow">
-            <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-5 text-white" href="../templates/index.html">
+            <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-5 text-white" href="{% url 'index' %}">
                 <img src="../static/images/logo.png" width="50px" alt="Logo">
                 <span class="ms-2">VibeCheck</span>
             </a>
@@ -93,13 +94,13 @@
 
                             <ul class="nav flex-column mb-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link d-flex align-items-center gap-2" href="../templates/passwordChange.html">
+                                    <a class="nav-link d-flex align-items-center gap-2" href="{% url 'passwordChange' %}">
                                         <svg class="bi" aria-hidden="true"><use xlink:href="#gear-wide-connected"></use></svg>
                                         Change password
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link d-flex align-items-center gap-2" href="../templates/login.html">
+                                    <a class="nav-link d-flex align-items-center gap-2" href="{% url 'logoutuser' %}">
                                         <svg class="bi" aria-hidden="true"><use xlink:href="#door-closed"></use></svg>
                                         Log out
                                     </a>
@@ -121,7 +122,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col me-2">
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Playlists made</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">103</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{numPlaylists}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -133,7 +134,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col me-2">
                                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Average mark</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">8.1</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{avg}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -151,30 +152,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for activity in activities %}
                                     <tr>
-                                        <td>14:38</td>
-                                        <td>dzonis03</td>
-                                        <td><span>Letnji mix</span></td>
-                                        <td>8</td>
+                                        <td>{{activity.time}}</td>
+                                        <td>{{activity.iduser.idauth.username}}</td>
+                                        <td><span>{{activity.created.idplaylist.name}}</span></td>
+                                        <td>{{activity.rating}}</td>
                                     </tr>
-                                    <tr>
-                                        <td>14:23</td>
-                                        <td>dzonis03</td>
-                                        <td><span>80s party</span></td>
-                                        <td>9</td>
-                                    </tr>
-                                    <tr>
-                                        <td>14:14</td>
-                                        <td>masac</td>
-                                        <td><span>Plejlista za kola</span></td>
-                                        <td>10</td>
-                                    </tr>
-                                    <tr>
-                                        <td>14:03</td>
-                                        <td>masac</td>
-                                        <td><span>Summer hits</span></td>
-                                        <td>7</td>
-                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -193,51 +178,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                {% for trend in trending %}
                                     <tr>
-                                        <td>#1</td>
-                                        <td>Play Radio 2016</td>
-                                        <td>8.6</td>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{trend.created.idplaylist.name}}</td>
+                                        <td>{{trend.rate}}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Edit</button>
+                                            <form method = "post">
+                                                {%csrf_token%}
+                                                <input type="hidden" name="form_type" value="trending">
+                                                <input type="hidden" name="created" value="{{ trend.created.id }}">
+                                                <button type= "submit" class="btn btn-sm btn-outline-danger action-btn" name="action" value="remove">Remove</button>
+                                                <button type= "submit" class="btn btn-sm btn-outline-primary action-btn" name="action" value="edit">Edit</button>
+                                            </form>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>#2</td>
-                                        <td>80s party</td>
-                                        <td>7.9</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#3</td>
-                                        <td>Plejlista za kola</td>
-                                        <td>9.1</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#4</td>
-                                        <td>Letnji mix</td>
-                                        <td>9.5</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#5</td>
-                                        <td>Potopicu ovaj splav</td>
-                                        <td>7.3</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Edit</button>
-                                        </td>
-                                    </tr>
+                                {%endfor%}
                                 </tbody>
                             </table>
 
@@ -258,61 +214,55 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                {% for playlist in playlists %}
                                     <tr>
-                                        <td>#1</td>
-                                        <td>Billboard Hot 100</td>
-                                        <td></td>
-                                        <td>Still not uploaded to Trending</td>
+                                        <td>{{forloop.counter }}</td>
+                                        <td>{{playlist.created.idplaylist.name}}</td>
+                                        <td>{{playlist.rate}}</td>
+                                        {% if playlist.created.trending %}
+                                        <td>On Trending Page</td>
+                                        {% else %}
+                                        <td>Not on Trending Page</td>
+                                        {% endif %}
                                         <td>
-                                            <button class="btn btn-sm btn-outline-secondary action-btn"><a href="playlistView.html">Edit</a></button>
-                                            <button class="btn btn-sm btn-outline-success action-btn">Upload to Trending</button>
+                                            <form method = "post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="form_type" value="myPlaylists">
+                                                <input type="hidden" name="created" value="{{ playlist.created.id }}">
+                                                <button type= "submit" class="btn btn-sm btn-outline-secondary action-btn" name="action" value="edit">Edit</button>
+                                                {% if playlist.created.trending %}
+                                                <button type= "submit" class="btn btn-sm btn-outline-danger action-btn" name="action" value="remove">Remove from Trending</button>
+                                                {% else %}
+                                                <button type= "submit" class="btn btn-sm btn-outline-success action-btn" name="action" value="upload">Upload to Trending</button>
+                                                {% endif %}
+                                            </form>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>#2</td>
-                                        <td>Play Radio 2016</td>
-                                        <td>8.6</td>
-                                        <td>On Trending page</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-secondary action-btn">Edit</button>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove from Trending</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#3</td>
-                                        <td>Pregame kod Mine</td>
-                                        <td>8.3</td>
-                                        <td>Removed from Trending</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-secondary action-btn">Edit</button>
-                                            <button class="btn btn-sm btn-outline-success action-btn">Upload to Trending</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#4</td>
-                                        <td>Potopicu ovaj splav</td>
-                                        <td>7.3</td>
-                                        <td>On Trending page</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-secondary action-btn">Edit</button>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove from Trending</button>
-                                        </td>
-                                    </tr>
+                                {%endfor%}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
-                    
-
-                    <!-- Create Playlist Section -->
                     <div id="createPlaylist-section" class="section-content">
-                        
+                        <form method="post">
+                           {% csrf_token %}
+                            <input type="hidden" name="form_type" value="createPlaylist">
+                            <div class="row ">
+                                <div class="col-12 d-flex nameform">
+                                    <input type="text" name = "name" class="form-control input collabin" style="width: 30vw;" placeholder="Playlist name">
+                                </div>
+                            </div>
+                            <button type= "submit" class ="btn new_collab">MAKE PLAYLIST</button>
+                            <div>{{mess}}</div>
+                        </form>
                     </div>
                 </main>
             </div>
         </div>
+        <script>
+          window.ACTIVE_SECTION = "{{ active_section|default:'home'|escapejs }}";
+        </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-        <script src="../static/js/moderator.js"></script>
+        <script src="{% static 'js/moderator.js' %}"></script>
     </body>
 </html>
