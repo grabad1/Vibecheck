@@ -475,7 +475,7 @@ def collabPage(request, id):
             'user': i.iduser.idauth,
         })
         print(i.idsong.name)
-    return render(request, 'collabPage.html', {'collab': collab, 'playlist': playlist, 'users': users, 'status': True})
+    return render(request, 'collabPage.html', {'collab': collab, 'playlist': playlist, 'users': users, 'status': True, 'count':len(playlist)})
 
 
 import requests
