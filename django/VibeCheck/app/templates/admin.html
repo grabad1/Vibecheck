@@ -99,13 +99,13 @@
 
                             <ul class="nav flex-column mb-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link d-flex align-items-center gap-2" href="../templates/passwordChange.html">
+                                    <a class="nav-link d-flex align-items-center gap-2" href="{% url 'passwordChange' %}">
                                         <svg class="bi" aria-hidden="true"><use xlink:href="#gear-wide-connected"></use></svg>
                                         Change password
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link d-flex align-items-center gap-2" href="../templates/login.html">
+                                    <a class="nav-link d-flex align-items-center gap-2" href="{% url 'logoutuser' %}">
                                         <svg class="bi" aria-hidden="true"><use xlink:href="#door-closed"></use></svg>
                                         Log out
                                     </a>
@@ -127,7 +127,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col me-2">
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">563</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ users_count }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col me-2">
                                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Playlists</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">836</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ playlist_count }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -151,7 +151,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col me-2">
                                                 <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Moderators</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">89</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ moderators_count }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -163,7 +163,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col me-2">
                                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Active Subscriptions</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">233</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_subscriptions_count }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -182,35 +182,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>14:32</td>
-                                        <td>Created a new playlist</td>
-                                        <td>nostalgia_maniac</td>
-                                        <td><span class="badge bg-primary status-badge">Moderator</span></td>
-                                        <td>Name: Play Radio 2016</td>
-                                    </tr>
-                                    <tr>
-                                        <td>14:28</td>
-                                        <td>Liked Playlist #1</td>
-                                        <td>dzonis03</td>
-                                        <td><span class="badge bg-success status-badge">Premium</span></td>
-                                        <td>Mark 9/10</td>
-                                    </tr>
-                                    <tr>
-                                        <td>14:15</td>
-                                        <td>Premium purchase</td>
-                                        <td>masac</td>
-                                        <td><span class="badge bg-success status-badge">Premium</span></td>
-                                        <td>VibeCheck Premium</td>
-                                    </tr>
-                                    <tr>
-                                        <td>14:02</td>
-                                        <td>New user registration</td>
-                                        <td>masac</td>
-                                        <td><span class="badge bg-secondary status-badge">Registered</span></td>
-                                        <td>Account creation</td>
-                                    </tr>
-                                </tbody>
+                                    {% for row in dashboard %}
+                                        <tr>
+                                            <td>{{ row.time }}</td>
+                                            <td>{{ row.activity }}</td>
+                                            <td>{{ row.user }}</td>
+                                            {% if row.status == "regular" %}
+                                                <td><span class="badge bg-secondary status-badge">Registered</span></td>
+                                            {% elif row.status == "premium" %}
+                                                <td><span class="badge bg-success status-badge">Premium</span></td>
+                                            {% else %}
+                                                <td><span class="badge bg-primary status-badge">Moderator</span></td>
+                                            {% endif %}
+                                            <td>{{ row.details }}</td>
+                                        </tr>
+                                    {% endfor %}
                             </table>
                         </div>
                     </div>
@@ -230,72 +216,34 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>#1</td>
-                                        <td>dzonis03</td>
-                                        <td>simi@gmail.com</td>
-                                        <td>05.08.2025.</td>
-                                        <td><span class="badge bg-success status-badge">Premium</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Promote</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#2</td>
-                                        <td>masac</td>
-                                        <td>masaflower@example.com</td>
-                                        <td>06.08.2025.</td>
-                                        <td><span class="badge bg-success status-badge">Premium</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Promote</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#3</td>
-                                        <td>boki489</td>
-                                        <td>boki@example.com</td>
-                                        <td>04.08.2025.</td>
-                                        <td><span class="badge bg-secondary status-badge">Registered</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Promote</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#4</td>
-                                        <td>ana123</td>
-                                        <td>anap123@example.com</td>
-                                        <td>10.08.2025.</td>
-                                        <td><span class="badge bg-secondary status-badge">Registered</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Promote</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#5</td>
-                                        <td>nostalgia_maniac</td>
-                                        <td>nostalgia@maniac.com</td>
-                                        <td>10.08.2025.</td>
-                                        <td><span class="badge bg-primary status-badge">Moderator</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-secondary action-btn">Demote</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#6</td>
-                                        <td>graba</td>
-                                        <td>graba@example.com</td>
-                                        <td>10.08.2025.</td>
-                                        <td><span class="badge bg-success status-badge">Premium</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                            <button class="btn btn-sm btn-outline-primary action-btn">Promote</button>
-                                        </td>
-                                    </tr>
+                                    {% for user in users %}
+                                        <tr>
+                                            <td>#{{ user.id }}</td>
+                                            <td>{{ user.name }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.joined }}</td>
+                                            {% if user.status == "regular" %}
+                                                <td><span class="badge bg-secondary status-badge">Registered</span></td>
+                                            {% elif user.status == "premium" %}
+                                                <td><span class="badge bg-success status-badge">Premium</span></td>
+                                            {% else %}
+                                                <td><span class="badge bg-primary status-badge">Moderator</span></td>
+                                            {% endif %}
+                                            <td>
+                                                <form method="post" style="margin: 0;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="form_type" value="users">
+                                                    <input type="hidden" name="userid" value="{{ user.id }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger action-btn" name="action" value="remove">Remove</button>
+                                                    {% if user.status == "regular" or user.status == "premium" %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary action-btn" name="action" value="promote">Promote</button>
+                                                    {% else %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary action-btn" name="action" value="demote">Demote</button>
+                                                    {% endif %}
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -316,46 +264,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>#1</td>
-                                        <td>Billboard Hot 100</td>
-                                        <td>billboard 100</td>
-                                        <td>589</td>
-                                        <td>9.4/10</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#2</td>
-                                        <td>Play Radio 2016</td>
-                                        <td>nostalgia_maniac</td>
-                                        <td>652</td>
-                                        <td>9.1/10</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#3</td>
-                                        <td>Pregame kod Mine</td>
-                                        <td>dzonis03</td>
-                                        <td>212</td>
-                                        <td>8.3/10</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#4</td>
-                                        <td>Potopicu ovaj splav</td>
-                                        <td>__jovana.nc__</td>
-                                        <td>156</td>
-                                        <td>7.3/10</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger action-btn">Remove</button>
-                                        </td>
-                                    </tr>
+                                    {% for t in trending %}
+                                        <tr>
+                                            <td>#{{ t.order }}</td>
+                                            <td>{{ t.name }}</td>
+                                            <td>{{ t.author }}</td>
+                                            <td>{{ t.likes }}</td>
+                                            <td>{{ t.score }}</td>
+                                            <td>
+                                                <form method="post" style="margin: 0;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="form_type" value="trending">
+                                                    <input type="hidden" name="fordelete" value="{{ t.id }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger action-btn">Remove</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -376,38 +301,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>#1</td>
-                                        <td>dzonis03</td>
-                                        <td>VibeCheck Premium</td>
-                                        <td>$5</td>
-                                        <td>10.08.2025.</td>
-                                        <td><span class="badge bg-success status-badge">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#2</td>
-                                        <td>masac</td>
-                                        <td>VibeCheck Premium</td>
-                                        <td>$5</td>
-                                        <td>10.08.2025.</td>
-                                        <td><span class="badge bg-success status-badge">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#3</td>
-                                        <td>graba</td>
-                                        <td>VibeCheck Premium</td>
-                                        <td>$5</td>
-                                        <td>10.08.2025.</td>
-                                        <td><span class="badge bg-success status-badge">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#4</td>
-                                        <td>new_subscriber</td>
-                                        <td>VibeCheck Premium</td>
-                                        <td>$5</td>
-                                        <td>05.07.2025.</td>
-                                        <td><span class="badge bg-danger status-badge">Expired</span></td>
-                                    </tr>
+                                    {% for p in all_purchases %}
+                                        <tr>
+                                            <td>#{{ p.id }}</td>
+                                            <td>{{ p.iduser }}</td>
+                                            <td>VibeCheck Premium</td>
+                                            <td>$5</td>
+                                            <td>{{ p.time }}</td>
+                                            {% if p.state == 'active' %}
+                                                <td><span class="badge bg-success status-badge">Active</span></td>
+                                            {% elif p.state == 'inactive' %}
+                                                <td><span class="badge bg-danger status-badge">Expired</span></td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>

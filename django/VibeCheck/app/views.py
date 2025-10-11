@@ -3,6 +3,7 @@ from django.contrib.auth.models import User as djangoUser
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import *
+from datetime import datetime, timedelta
 
 
 def index(request):
@@ -23,7 +24,178 @@ def checkout(request):
 
 
 def admin(request):
-    return render(request, 'admin.html')
+    if request.method == 'POST':
+        form_type = request.POST.get('form_type')
+        if form_type == 'trending':
+            delete = request.POST.get('fordelete')
+            plejlista = Playlist.objects.get(idplaylist=delete)
+            created = Created.objects.get(idplaylist=plejlista)
+            created.delete()
+
+        elif form_type == 'users':
+            action = request.POST.get('action')
+            if action == 'remove':
+                delete = request.POST.get('userid')
+                korisnik = User.objects.get(iduser=delete)
+                korisnik.delete()
+            elif action == 'promote':
+                promote = request.POST.get('userid')
+                korisnik = User.objects.get(iduser=promote)
+                korisnik.type = "moderator"
+                korisnik.save()
+            else:
+                demote = request.POST.get('userid')
+                korisnik = User.objects.get(iduser=demote)
+
+                subscriptions = Purchased.objects.filter(iduser=demote)
+                subscription = subscriptions.last()
+
+                if datetime.now().date() - subscription.date.date() < timedelta(days=30):
+                    korisnik.type = "premium"
+                else:
+                    korisnik.type = "regular"
+                korisnik.save()
+
+    dashboard = []
+    all_purchases = []
+    all_users = []
+    trending_playlists = []
+    liked = Liked.objects.all()
+    purchased = Purchased.objects.all()
+    rated = Rated.objects.all()
+    requested_collab = Requestcollab.objects.all()
+    requested_friendship = Requestfriendship.objects.all()
+    auth_users = djangoUser.objects.all()
+
+    tp = Created.objects.filter(trending=1)
+    for p in tp:
+        row = {
+            'name': p.idplaylist.name,
+            'author': p.iduser.idauth.username,
+            'likes': Liked.objects.filter(created=p).count(),
+            'score': None,
+            'order': None,
+            'id': p.idplaylist.idplaylist
+        }
+
+        rated = Rated.objects.filter(created=p)
+        sum = 0
+        count = 0
+        avg = 0
+        for r in rated:
+            sum += r.rating
+        if count == 0:
+            avg = 0
+        else:
+            avg = sum / count
+        row['score'] = avg
+        trending_playlists.append(row)
+
+    sorted_trending_playlists = sorted(trending_playlists, key=lambda k: k['score'])
+    count = len(sorted_trending_playlists)
+    for s in sorted_trending_playlists:
+        s['order'] = count
+        count -= 1
+
+    users = User.objects.all()
+    for user in users:
+        row = {
+            'id': user.iduser,
+            'name': user.idauth.username,
+            'email': user.idauth.email,
+            'joined': user.idauth.date_joined.date(),
+            'status': user.type
+        }
+        all_users.append(row)
+
+    for l in liked:
+        row = {
+            'time': l.time,
+            'activity': f"Liked a playlist by {l.created.iduser.idauth.username}",
+            'user': l.iduser.idauth.username,
+            'status': l.iduser.type,
+            'details': f"Playlist name: {l.created.idplaylist.name}"
+        }
+        dashboard.append(row)
+    for p in purchased:
+        row = {
+            'time': p.date,
+            'activity': "Payment",
+            'user': p.iduser.idauth.username,
+            'status': p.iduser.type,
+            'details': "VibeCheck Premium subscription"
+        }
+        purchase = {
+            'id': p.idpur,
+            'iduser': p.iduser.idauth.username,
+            'time': p.date.date(),
+        }
+        if datetime.now().date() - p.date.date() < timedelta(days=30):
+            purchase['state'] = 'active'
+        else:
+            purchase['state'] = 'inactive'
+        dashboard.append(row)
+        all_purchases.append(purchase)
+    for r in rated:
+        row = {
+            'time': r.time,
+            'activity': f"Rated a playlist by {r.created.iduser.idauth.username}",
+            'user': r.iduser.idauth.username,
+            'status': r.iduser.type,
+            'details': f"Playlist name: {r.created.idplaylist.name}, Rating: {r.rating}"
+        }
+        dashboard.append(row)
+    for rc in requested_collab:
+        row = {
+            'time': rc.time,
+            'activity': "Requested a collab with another user",
+            'user': rc.idusersend.idauth.username,
+            'status': rc.idusersend.type,
+            'details': f"Other user: {rc.iduserrecieve.idauth.username}"
+        }
+        dashboard.append(row)
+    for rf in requested_friendship:
+        row = {
+            'time': rf.time,
+            'activity': "Sent a friend request",
+            'user': rf.idusersend.idauth.username,
+            'status': rf.idusersend.type,
+            'details': f"Other user: {rf.iduserrecieve.idauth.username}"
+        }
+        dashboard.append(row)
+    for au in auth_users:
+        row = {
+            'time': au.date_joined,
+            'activity': "User authorized",
+            'user': au.username,
+            'status': User.objects.get(idauth=au.id).type,
+            'details': "Succesful account creation"
+        }
+        dashboard.append(row)
+    dashboard_sorted = sorted(dashboard, key=lambda k: k['time'], reverse=True)
+    all_purchases_sorted = sorted(all_purchases, key=lambda k: k['id'], reverse=True)
+
+    users_count = User.objects.count()
+    playlist_count = Playlist.objects.count()
+    moderators_count = User.objects.filter(type='moderator').count()
+    active_subscriptions_count = User.objects.filter(type='premium').count()
+
+
+
+    context = {
+        "dashboard": dashboard_sorted,
+        "playlist_count": playlist_count,
+        "moderators_count": moderators_count,
+        "active_subscriptions_count": active_subscriptions_count,
+        "users_count": users_count,
+        "all_purchases": all_purchases_sorted,
+        "trending": sorted_trending_playlists,
+        "users": all_users
+    }
+
+    #print(sorted_trending_playlists)
+
+    return render(request, 'admin.html', context)
 
 
 def createCollab(request, collabid):
