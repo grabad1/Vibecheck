@@ -72,9 +72,12 @@
                                 <li>Add unlimited number of songs</li>
                                 <li>Sky is the limit!</li>
                             </ul>
-                            <button type="button" class="w-100 btn btn-lg btn-primary pixel-text small-text gradient-btn mt-auto" onclick="location.href='{% url 'checkout' %}'">
+                            <form method="post" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="w-100 btn btn-lg btn-primary pixel-text small-text gradient-btn mt-auto">
                                 Get started
                             </button>
+                            </form>
                         </div>
                     </div>
                 </div>

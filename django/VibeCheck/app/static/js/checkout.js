@@ -1,19 +1,17 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.needs-validation');
+    const button = form?.querySelector('.submit-button');
 
-(() => {
-    const forms = document.querySelectorAll('.needs-validation');
+    if (!form || !button) return;
 
-    Array.from(forms).forEach(form => {
-        const button = form.querySelector('.submit-button');
+    button.addEventListener('click', event => {
+        event.preventDefault();
 
-        if (button) {
-            button.addEventListener('click', () => {
-                if (!form.checkValidity()) {
-                    form.classList.add('was-validated');
-                } else {
-                    window.location.href = 'successful_payment.html';
-                }
-            });
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
         }
-    });
-})();
 
+        form.submit(); // real submission to Django's /checkout/
+    });
+});
