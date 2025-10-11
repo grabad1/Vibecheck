@@ -71,7 +71,6 @@ def createCollab(request, collabid):
 
     return render(request, 'createCollab.html', createCollab_context(user, collabid))
 
-@login_required(login_url='loginuser')
 def createCollab_context(user, collabid, extra=None):
     participants = Participated.objects.filter(idcollab=collabid)
     friendlist = get_friends_list(user)
@@ -526,7 +525,13 @@ def add_track(request, id):
             song.artist = request.POST.get("artist")
             song.spotify_id = spotify_id
             song.name = request.POST.get("name")
-            song.duration = request.POST.get("duration")
+
+            dur = int(request.POST.get("duration"))
+            song.duration = dur
+            total_seconds = dur // 1000
+            minutes = total_seconds // 60
+            seconds = total_seconds % 60
+            song.duration_string = f"{minutes}:{seconds:02d}"
             song.imagelink = request.POST.get("imagelink")
             song.link = request.POST.get("link")
             song.save()

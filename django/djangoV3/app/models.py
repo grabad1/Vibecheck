@@ -27,7 +27,7 @@ class Song(models.Model):
     artist = models.CharField(max_length=45, blank=True, null=True)
     imagelink = models.CharField(max_length=150, blank=True, null=True)
     duration = models.IntegerField(blank=True, null=True)
-
+    duration_string = models.CharField(max_length=45)
     spotify_id = models.CharField(max_length=50, unique=True)
     class Meta:
         managed = False
