@@ -22,11 +22,11 @@
         <header class="top-bar">
             <div class="top-left">
                 {% if status != True %}
-                <a href="{% url 'index' %}"><img class="imgLogo" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
-                <a href="{% url 'index' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
-                {%else%}
                 <a href="{% url 'moderator' %}"><img class="imgLogo" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
                 <a href="{% url 'moderator' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
+                {%else%}
+                <a href="{% url 'index' %}"><img class="imgLogo" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
+                <a href="{% url 'index' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
                 {% endif %}
             </div>
             {% if status != True %}
