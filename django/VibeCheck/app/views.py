@@ -785,12 +785,14 @@ def add_track(request, id):
             song.imagelink = request.POST.get("imagelink")
             song.link = request.POST.get("link")
             song.save()
+        else:
+            song = Song.objects.filter(spotify_id=spotify_id).first()
+        if not Contains.objects.filter(idsong=song, idplaylist=pl).exists():
             contains = Contains()
             contains.idsong = song
             contains.idplaylist = pl
             contains.iduser = user
             contains.save()
-
         return redirect('collabPage', id=id)
 
 
