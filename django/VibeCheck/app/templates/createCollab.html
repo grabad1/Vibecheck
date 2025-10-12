@@ -50,7 +50,10 @@
                 <div class="col-12">
                     <input type="hidden" name="form_type" value="start">
                     <button type= "submit" class ="btn new_collab">START COLLAB</button>
-                    <div>{{mess}}</div>
+                    <div id="error-message" style="display: none;"></div>
+                    {% if mess %}
+                    <div class="alert">{{ mess }}</div>
+                    {% endif %}
 
                 </div>
             </div>

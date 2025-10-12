@@ -26,11 +26,13 @@ $(document).ready(function(){
         const collabId = document.body.dataset.collabId;
         if(!collabId) return;
 
+
         fetch(`/ajax/friends-collab/${collabId}/`)
             .then(res => res.json())
             .then(data => {
                 const list = $(".friends-list").empty();
                 data.forEach(friend => {
+
                     const form = $(`
                         <form class="friend-invite-form">
                             <input type="hidden" name="form_type" value="friends">
@@ -43,6 +45,7 @@ $(document).ready(function(){
                         const btn = $('<button type="button" class="btn addfriend">+</button>');
                         form.append(btn);
                     }
+
                     form.append('<br>');
                     list.append(form);
                 });
@@ -51,13 +54,10 @@ $(document).ready(function(){
     }
 
    $(document).on('click', '.addfriend', function(e){
-        console.log('=== KLIK NA + DUGME ===');
         e.preventDefault();
         e.stopPropagation();
 
         const button = $(this);
-        console.log('Button element:', button);
-        console.log('Button disabled?', button.prop('disabled'));
 
         if(button.prop('disabled')) {
             return;
@@ -65,10 +65,8 @@ $(document).ready(function(){
         button.prop('disabled', true);
 
         const form = button.closest('form')[0];
-        console.log('Form:', form);
 
         if(!form) {
-            console.error('GREŠKA: Forma nije pronađena!');
             button.prop('disabled', false);
             return;
         }
@@ -91,13 +89,14 @@ $(document).ready(function(){
             })
             .then(resp => {
                 if(resp.ok){
-                    button.fadeOut(200, function() {
-                        $(this).remove();
-                    });
+                    $('#error-message').hide();
 
                     refreshParticipants();
                     setTimeout(refreshFriendsList, 500);
                 } else {
+                    if(resp.error) {
+                        $('#error-message').text(resp.error).fadeIn();
+                    }
                     button.prop('disabled', false);
                 }
             })
@@ -111,7 +110,6 @@ $(document).ready(function(){
         refreshParticipants();
         refreshFriendsList();
     }, 5000);
-
     refreshParticipants();
     refreshFriendsList();
 });

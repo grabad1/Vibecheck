@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 import requests
 from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta
-
+from django.contrib import messages
 from .models import *
 
 
@@ -13,6 +13,13 @@ def index(request):
     if request.user.is_authenticated:
         user = User.objects.get(idauth=request.user)
         user_type = user.type
+        purchases = Purchased.objects.filter(iduser=user)
+        p = None
+        if purchases.exists():
+            p = purchases.first()
+        if user_type == 'premium' and datetime.now().date() - p.date.date() > timedelta(days=30):
+            user.type = 'regular'
+            user.save()
         if user_type in ('regular', 'premium'):
             return redirect('user')
         elif user_type == 'moderator':
@@ -312,8 +319,6 @@ def admin(request):
         'active_section': section
     }
 
-    # print(sorted_trending_playlists)
-
     return render(request, 'admin.html', context)
 
 
@@ -335,8 +340,24 @@ def createCollab(request, collabid):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
         if form_type == 'friends':
+            sent_count = Requestcollab.objects.filter(
+                idusersend=user,
+                idcollab=collabid
+            ).count()
+            participants_count = Participated.objects.filter(idcollab=collabid).count()
+            total_count = participants_count + sent_count
+            if user.type == 'regular' and total_count >= 4:
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'ok': False,
+                        'error': 'As a regular user, you can add a maximum of 3 people.'
+                    })
+                mess = "As a regular user, you can add a maximum of 3 people."
+                context = createCollab_context(user, collabid, {'mess': mess})
+                return render(request, 'createCollab.html', context)
             friend_id = request.POST.get('friend_id')
             friend = User.objects.get(idauth=friend_id)
+
             existing = Requestcollab.objects.filter(
                 idcollab=collabid,
                 iduserrecieve=friend
@@ -457,7 +478,7 @@ def moderator(request):
             action = request.POST.get('action')
             if action == 'edit':
                 collab = Collab.objects.get(idplaylist=create.idplaylist).idcollab
-                return redirect('collabPage', collab)
+                return redirect('makePlaylist', collab)
             elif action == 'remove':
                 create.trending = 0
                 create.save()
@@ -563,10 +584,8 @@ def userpage(request):
 
             sender = user
 
-            if Requestfriendship.objects.filter(idusersend=receiver) \
-                    .filter(iduserrecieve=sender).exists() \
-                    or Requestfriendship.objects.filter(idusersend=sender) \
-                    .filter(iduserrecieve=receiver).exists():
+            if Requestfriendship.objects.filter(idusersend=receiver, iduserrecieve=sender).exists() \
+                    or Requestfriendship.objects.filter(idusersend=sender, iduserrecieve=receiver).exists():
                 mess = "Request already sent"
                 context = user_context(sender, {'mess': mess})
                 return render(request, 'user.html', context)
@@ -583,6 +602,10 @@ def userpage(request):
             mailbox(mail_id, action, type, user)
 
         elif form_type == 'collab':
+            if user.type == "regular" and Collab.objects.filter(iduser=user).count() >= 5:
+                mess = "As a regular user, you can have a maximum of 5 collabs"
+                context = user_context(user, {'mess1': mess})
+                return render(request, 'user.html', context)
             play = Playlist.objects.create()
             coll = Collab.objects.create(
                 iduser=user,
@@ -736,13 +759,19 @@ def search_spotify(request, id):
     data = res.json()["tracks"]["items"]
     return render(request, "search.html", {"tracks": data, "id": id})
 
-
 @login_required(login_url='loginuser')
 def add_track(request, id):
+    user = User.objects.get(idauth=request.user)
+    pl = Collab.objects.get(idcollab=id).idplaylist
+    num = Contains.objects.filter(iduser=user, idplaylist=pl).count()
+    if user.type == 'regular' and num >= 10:
+        messages.error(request, 'As a regular user, you can add a maximum of 10 songs.')
+        return redirect('collabPage', id=id)
     if request.method == "POST":
         spotify_id = request.POST.get("spotify_id")
         song = Song()
-        if len(Song.objects.filter(spotify_id=spotify_id)) == 0:
+        if Song.objects.filter(spotify_id=spotify_id).count() == 0:
+            print("Nema vec")
             song.artist = request.POST.get("artist")
             song.spotify_id = spotify_id
             song.name = request.POST.get("name")
@@ -756,13 +785,12 @@ def add_track(request, id):
             song.imagelink = request.POST.get("imagelink")
             song.link = request.POST.get("link")
             song.save()
-        else:
-            song = Song.objects.filter(spotify_id=spotify_id).first()
-        contains = Contains()
-        contains.idsong = song
-        contains.idplaylist = Collab.objects.get(idcollab=id).idplaylist
-        contains.iduser = User.objects.filter(idauth=request.user).first()
-        contains.save()
+            contains = Contains()
+            contains.idsong = song
+            contains.idplaylist = pl
+            contains.iduser = user
+            contains.save()
+
         return redirect('collabPage', id=id)
 
 

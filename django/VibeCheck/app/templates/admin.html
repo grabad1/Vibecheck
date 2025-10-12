@@ -191,8 +191,10 @@
                                                 <td><span class="badge bg-secondary status-badge">Registered</span></td>
                                             {% elif row.status == "premium" %}
                                                 <td><span class="badge bg-success status-badge">Premium</span></td>
-                                            {% else %}
+                                            {% elif row.status == "moderator" %}
                                                 <td><span class="badge bg-primary status-badge">Moderator</span></td>
+                                            {% else %}
+                                                <td><span class="badge bg-info status-badge">Admin</span></td>
                                             {% endif %}
                                             <td>{{ row.details }}</td>
                                         </tr>
@@ -226,8 +228,10 @@
                                                 <td><span class="badge bg-secondary status-badge">Registered</span></td>
                                             {% elif user.status == "premium" %}
                                                 <td><span class="badge bg-success status-badge">Premium</span></td>
-                                            {% else %}
+                                            {% elif user.status == "moderator" %}
                                                 <td><span class="badge bg-primary status-badge">Moderator</span></td>
+                                            {% else %}
+                                                <td><span class="badge bg-info status-badge">Admin</span></td>
                                             {% endif %}
                                             <td>
                                                 <form method="post" style="margin: 0;">

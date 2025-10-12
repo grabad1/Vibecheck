@@ -23,13 +23,9 @@
     <div class="collab-container">
         <header class="top-bar">
             <div class="top-left">
-                {% if status != True %}
-                <a href="{% url 'moderator' %}"><img class="imgLogo" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
-                <a href="{% url 'moderator' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
-                {%else%}
                 <a href="{% url 'index' %}"><img class="imgLogo" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
                 <a href="{% url 'index' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
-                {% endif %}
+
             </div>
             {% if status == True %}
             <div class = "items">
@@ -117,6 +113,15 @@
                             </div>
                             <ul id="search-results" class="search-suggestions"></ul>
                         </div>
+                        {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}" role="alert">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <div id="loginbtn">
                             <a href="{% url 'index' %}"><button class="btn btn-lg btn-primary gradient-btn" id="login">Save playlist!</button></a>
                         </div>
