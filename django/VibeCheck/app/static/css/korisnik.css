@@ -151,7 +151,7 @@ a {
 
 }
 
-.friends-list, .collabs-list, .mail-list{
+.friends-list, .collabs-list, .mail-list, .participants-list{
     color: white;
     font-family: "Jersey 15", sans-serif;
     font-size: clamp(2rem, 2.5vw, 3rem);

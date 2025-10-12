@@ -1,8 +1,11 @@
 <!--Maša Cvetanovski-->
 {% extends 'user.html' %}
+{%load static%}
 {% block title %}
 <title>CreateCollab</title>
 {% endblock %}
+
+{% block body_data %}data-collab-id="{{ collabid }}"{% endblock %}
 
 {% block content %}
 <div class="row sections">
@@ -34,7 +37,7 @@
             <div class="row">
                 <div class="col-12">
                     <div ><p class="collabs-text" style="text-align: left;">PARTICIPANTS</p></div>
-                    <div class = "friends-list"style="text-align: left;">
+                    <div class = "participants-list" style="text-align: left;">
                         {%for user in participants%}
                         {{user.iduser.idauth.username}}
                         <br>
@@ -62,3 +65,8 @@
     </div>
 </div>
 {% endblock %}
+{%block js%}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="{% static 'js/createCollab.js' %}"></script>
+{%endblock%}
+

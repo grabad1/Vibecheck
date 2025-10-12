@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link href = "../static/css/korisnik.css" rel = "stylesheet">
     <link rel="stylesheet" href="{% static 'css/CollabPage.css' %}">
     <link rel="stylesheet" href="{% static 'css/trending.css' %}">
 </head>
@@ -25,7 +26,31 @@
                 <a href="{% url 'index' %}" style="text-decoration: none;"><span class="small-vibe">VibeCheck</span></a>
             </div>
             <div class="top-right-buttons">
-                <button class="btn premium-btn" onclick="location.href='{% url 'pricing' %}'"><img src="../static/images/crown.png"> Premium</button>
+                {% if request.user.is_authenticated %}
+                <div class = "items">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a href="{% url 'pricing' %}" class="nav-link active">Get Premium</a>
+                                </li>
+                            </ul>
+
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <div class="dropdown">
+                                        <div class = "dropdown-toggle nav-link" data-bs-toggle = "dropdown">{{request.user.username}}</div>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="{% url 'passwordChange' %}" class = "dropdown-item">Change password</a></li>
+                                            <li><a href="{% url 'logoutuser' %}" class = "dropdown-item">Log out</a></li>
+                                            <li><a href="#" class = "dropdown-item">Help</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                    <button class="btn login-btn" onclick="location.href='{% url 'loginuser' %}'">Login</button>
+            {% endif %}
+
             </div>
         </header>
 

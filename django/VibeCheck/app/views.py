@@ -2,8 +2,11 @@ from django.contrib.auth import login, authenticate, logout, update_session_auth
 from django.contrib.auth.models import User as djangoUser
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .models import *
+import requests
+from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta
+
+from .models import *
 
 
 def index(request):
@@ -19,6 +22,107 @@ def index(request):
     return render(request, 'index.html')
 
 
+def loginuser(request):
+    if request.user.is_authenticated:
+        return redirect('user')
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        remember_me = request.POST.get('remember-me')
+        try:
+            user = djangoUser.objects.get(username=username)
+        except:
+            mess = "User does not exist"
+            context = {'mess': mess}
+            return render(request, 'login.html', context)
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            if remember_me == 'on':
+                request.session.set_expiry(60 * 60 * 24 * 30)
+            else:
+                request.session.set_expiry(0)
+            user_obj = User.objects.get(idauth=user.id)
+            user_type = user_obj.type
+            if user_type in ('regular', 'premium'):
+                return redirect('user')
+            elif user_type == 'moderator':
+                return redirect('moderator')
+            elif user_type == 'admin':
+                return redirect('admin')
+        else:
+            mess = "Incorrect password"
+            context = {'mess': mess}
+            return render(request, 'login.html', context)
+    else:
+        return render(request, 'login.html')
+
+
+def passwordChange(request):
+    if request.method == 'POST':
+        old = request.POST['old']
+        new = request.POST['new']
+        confirm = request.POST['confirm']
+        username = request.user.username
+        user = authenticate(username=username, password=old)
+        if user is None:
+            mess = "Invalid password"
+            context = {'mess': mess}
+            return render(request, 'passwordChange.html', context)
+        elif confirm != new:
+            mess = "New password and confirmation must be the same."
+            context = {'mess': mess}
+            return render(request, 'passwordChange.html', context)
+        else:
+            user.set_password(new)
+            user.save()
+            update_session_auth_hash(request, user)
+            return redirect('successful_password_change')
+    else:
+        return render(request, 'passwordChange.html')
+
+
+def successful_password_change(request):
+    return render(request, 'successful_password_change.html')
+
+
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect('user')
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        email = request.POST['email']
+        user_type = 'regular'
+
+        if DjangoUser.objects.filter(username=username).exists():
+            mess = "Korisnik već postoji"
+            return render(request, 'signup.html', {'mess': mess})
+
+        django_user = DjangoUser.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        User.objects.create(
+            idauth=django_user,
+            type=user_type
+        )
+
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('user')
+
+        mess = "Došlo je do greške prilikom kreiranja korisnika"
+        return render(request, 'signup.html', {'mess': mess})
+
+    else:
+        return render(request, 'signup.html')
+
+
 def checkout(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
@@ -28,7 +132,7 @@ def checkout(request):
             user.save()
             return redirect('successful_payment')
         else:
-            context = {"mess" : "Error: Purchase failed!"}
+            context = {"mess": "Error: Purchase failed!"}
             return render('checkout', context)
     return render(request, 'checkout.html')
 
@@ -40,13 +144,14 @@ def admin(request):
             delete = request.POST.get('fordelete')
             plejlista = Playlist.objects.get(idplaylist=delete)
             created = Created.objects.get(idplaylist=plejlista)
-            created.delete()
-
+            plejlista.delete()
+            return redirect(f'/adminpage/?section=trending')
         elif form_type == 'users':
             action = request.POST.get('action')
             if action == 'remove':
                 delete = request.POST.get('userid')
                 korisnik = User.objects.get(iduser=delete)
+                korisnik.idauth.delete()
                 korisnik.delete()
             elif action == 'promote':
                 promote = request.POST.get('userid')
@@ -58,14 +163,15 @@ def admin(request):
                 korisnik = User.objects.get(iduser=demote)
 
                 subscriptions = Purchased.objects.filter(iduser=demote)
-                subscription = subscriptions.last()
-
-                if datetime.now().date() - subscription.date.date() < timedelta(days=30):
-                    korisnik.type = "premium"
-                else:
-                    korisnik.type = "regular"
+                if subscriptions.exists():
+                    subscription = subscriptions.last()
+                    if datetime.now().date() - subscription.date.date() < timedelta(days=30):
+                        korisnik.type = "premium"
+                        korisnik.save()
+                        return redirect(f'/adminpage/?section=users')
+                korisnik.type = "regular"
                 korisnik.save()
-
+            return redirect(f'/adminpage/?section=users')
     dashboard = []
     all_purchases = []
     all_users = []
@@ -94,6 +200,7 @@ def admin(request):
         avg = 0
         for r in rated:
             sum += r.rating
+            count += 1
         if count == 0:
             avg = 0
         else:
@@ -174,11 +281,13 @@ def admin(request):
         }
         dashboard.append(row)
     for au in auth_users:
+        if not User.objects.filter(idauth=au):
+            continue
         row = {
             'time': au.date_joined,
             'activity': "User authorized",
             'user': au.username,
-            'status': User.objects.get(idauth=au.id).type,
+            'status': User.objects.get(idauth=au).type,
             'details': "Succesful account creation"
         }
         dashboard.append(row)
@@ -190,8 +299,7 @@ def admin(request):
     moderators_count = User.objects.filter(type='moderator').count()
     active_subscriptions_count = User.objects.filter(type='premium').count()
 
-
-
+    section = request.GET.get('section', 'home')
     context = {
         "dashboard": dashboard_sorted,
         "playlist_count": playlist_count,
@@ -200,29 +308,48 @@ def admin(request):
         "users_count": users_count,
         "all_purchases": all_purchases_sorted,
         "trending": sorted_trending_playlists,
-        "users": all_users
+        "users": all_users,
+        'active_section': section
     }
 
-    #print(sorted_trending_playlists)
+    # print(sorted_trending_playlists)
 
     return render(request, 'admin.html', context)
+
+
+def pricing(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            return redirect('checkout')
+        else:
+            return redirect('loginuser')
+    return render(request, 'pricing.html')
+
+
+def successful_payment(request):
+    return render(request, 'successful_payment.html')
 
 
 def createCollab(request, collabid):
     user = User.objects.get(idauth=request.user)
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
-
         if form_type == 'friends':
             friend_id = request.POST.get('friend_id')
-            if Requestcollab.objects.filter(idcollab=Collab.objects.get(idcollab=collabid)) \
-                    .filter(iduserrecieve=User.objects.get(idauth=friend_id)).exists():
-                return render(request, 'createCollab.html', createCollab_context(user, collabid))
-            req = Requestcollab.objects.create(
-                idusersend=user,
-                iduserrecieve=User.objects.get(idauth=friend_id),
-                idcollab=Collab.objects.get(idcollab=collabid)
-            )
+            friend = User.objects.get(idauth=friend_id)
+            existing = Requestcollab.objects.filter(
+                idcollab=collabid,
+                iduserrecieve=friend
+            ).exists()
+            if not existing:
+                req = Requestcollab.objects.create(
+                    idusersend=user,
+                    iduserrecieve=friend,
+                    idcollab=Collab.objects.get(idcollab=collabid)
+                )
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'ok': True})
+
         elif form_type == 'exit':
             Requestcollab.objects.filter(idcollab=collabid).delete()
             Participated.objects.filter(idcollab=collabid).delete()
@@ -259,61 +386,48 @@ def createCollab_context(user, collabid, extra=None):
     friendlist = get_friends_list(user)
     friends = []
     for friend in friendlist:
-        if Requestcollab.objects.filter(iduserrecieve=User.objects.get(idauth=friend)).filter(
-                idcollab=collabid).exists():
-            friends.append({
-                'friend': friend,
-                'sent': True
-            })
-        else:
-            friends.append({
-                'friend': friend,
-                'sent': False
-            })
+        sent = Requestcollab.objects.filter(iduserrecieve=User.objects.get(idauth=friend)) \
+            .filter(idcollab=collabid).exists()
+        friends.append({
+            'friend': friend,
+            'sent': sent
+        })
     context = {
         'username': user.idauth.username,
         'friends': friends,
-        'participants': participants
+        'participants': participants,
+        'collabid': collabid
     }
     if extra:
         context.update(extra)
     return context
 
 
-def loginuser(request):
-    if request.user.is_authenticated:
-        return redirect('user')
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        remember_me = request.POST.get('remember-me')
-        try:
-            user = djangoUser.objects.get(username=username)
-        except:
-            mess = "User does not exist"
-            context = {'mess': mess}
-            return render(request, 'login.html', context)
-        user = authenticate(username=username, password=password)
-        if user:
-            login(request, user)
-            if remember_me == 'on':
-                request.session.set_expiry(60 * 60 * 24 * 30)
-            else:
-                request.session.set_expiry(0)
-            user_obj = User.objects.get(idauth=user.id)
-            user_type = user_obj.type
-            if user_type in ('regular', 'premium'):
-                return redirect('user')
-            elif user_type == 'moderator':
-                return redirect('moderator')
-            elif user_type == 'admin':
-                return redirect('admin')
-        else:
-            mess = "Incorrect password"
-            context = {'mess': mess}
-            return render(request, 'login.html', context)
-    else:
-        return render(request, 'login.html')
+@login_required
+def ajax_friends_collab(request, collabid):
+    user = User.objects.get(idauth=request.user)
+    collab = Collab.objects.get(idcollab=collabid)
+    friendlist = get_friends_list(user)
+    friends_data = []
+
+    for friend in friendlist:
+        friend_obj = User.objects.get(idauth=friend)
+        if Participated.objects.filter(iduser=friend_obj) \
+                .filter(idcollab=collabid).exists():
+            continue
+
+        sent = Requestcollab.objects.filter(
+            iduserrecieve=friend_obj,
+            idcollab=collab
+        ).exists()
+
+        friends_data.append({
+            'friend_id': friend.id,
+            'username': friend.username,
+            'sent': sent
+        })
+
+    return JsonResponse(friends_data, safe=False)
 
 
 def moderator(request):
@@ -423,97 +537,11 @@ def makePlaylist(request, id):
     return render(request, 'collabPage.html', context)
 
 
-def passwordChange(request):
-    if request.method == 'POST':
-        old = request.POST['old']
-        new = request.POST['new']
-        confirm = request.POST['confirm']
-        username = request.user.username
-        user = authenticate(username=username, password=old)
-        if user is None:
-            mess = "Invalid password"
-            context = {'mess': mess}
-            return render(request, 'passwordChange.html', context)
-        elif confirm != new:
-            mess = "New password and confirmation must be the same."
-            context = {'mess': mess}
-            return render(request, 'passwordChange.html', context)
-        else:
-            user.set_password(new)
-            user.save()
-            update_session_auth_hash(request, user)
-            return redirect('successful_password_change')
-    else:
-        return render(request, 'passwordChange.html')
-
-
-def playlist(request, idplaylist):
-    playlist = Playlist.objects.get(idplaylist=idplaylist)
-    return render(request, 'playlist.html')
-
-
-def playlistView(request):
-    return render(request, 'playlistView.html')
-
-
-def pricing(request):
-    if request.method == 'POST':
-        if request.user.is_authenticated:
-            return redirect('checkout')
-        else:
-            return redirect('loginuser')
-    return render(request, 'pricing.html')
-
-
-def signup(request):
-    if request.user.is_authenticated:
-        return redirect('user')
-
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        email = request.POST['email']
-        user_type = 'regular'
-
-        if DjangoUser.objects.filter(username=username).exists():
-            mess = "Korisnik već postoji"
-            return render(request, 'signup.html', {'mess': mess})
-
-        django_user = DjangoUser.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
-
-        User.objects.create(
-            idauth=django_user,
-            type=user_type
-        )
-
-        user = authenticate(username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('user')
-
-        mess = "Došlo je do greške prilikom kreiranja korisnika"
-        return render(request, 'signup.html', {'mess': mess})
-
-    else:
-        return render(request, 'signup.html')
-
-
-def successful_password_change(request):
-    return render(request, 'successful_password_change.html')
-
-
-def successful_payment(request):
-    return render(request, 'successful_payment.html')
-
-
 def userpage(request):
     user = User.objects.get(idauth=request.user)
-    col = Collab.objects.filter(status="created").filter(iduser=user.iduser).first()
-    if Collab.objects.filter(status="created").filter(iduser=user.iduser).exists():
+    collabs = Collab.objects.filter(status="created").filter(iduser=user.iduser)
+    col = collabs.first()
+    if collabs.exists():
         return redirect('createCollab', col.idcollab)
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -524,11 +552,16 @@ def userpage(request):
                 userr = djangoUser.objects.get(username=username)
             except:
                 mess = "User does not exist."
-                context = user_context(User.objects.get(idauth=request.user), {'mess': mess})
+                context = user_context(user, {'mess': mess})
                 return render(request, 'user.html', context)
 
             receiver = User.objects.get(idauth=userr)
-            sender = User.objects.get(idauth=request.user)
+            if receiver.type == 'moderator' or receiver.type == 'admin':
+                mess = "User does not exist."
+                context = user_context(user, {'mess': mess})
+                return render(request, 'user.html', context)
+
+            sender = user
 
             if Requestfriendship.objects.filter(idusersend=receiver) \
                     .filter(iduserrecieve=sender).exists() \
@@ -547,37 +580,18 @@ def userpage(request):
             mail_id = request.POST.get('mail_id')
             action = request.POST.get('action')
             type = request.POST.get('mail_type')
-            if action == 'accept' and type == 'm':
-                fr = Friendship.objects.create(
-                    request=Requestfriendship.objects.get(idrf=mail_id)
-                )
-
-            elif action == 'deny' and type == 'm':
-                req = Requestfriendship.objects.get(idrf=mail_id)
-                req.delete()
-
-            elif action == 'accept' and type == 'c':
-                req = Requestcollab.objects.get(idrc=mail_id)
-                fr = Participated.objects.create(
-                    iduser=User.objects.get(idauth=request.user),
-                    idcollab=req.idcollab
-                )
-                req.delete()
-
-            elif action == 'deny' and type == 'c':
-                req = Requestcollab.objects.filter(idrc=mail_id)
-                req.delete()
+            mailbox(mail_id, action, type, user)
 
         elif form_type == 'collab':
             play = Playlist.objects.create()
             coll = Collab.objects.create(
-                iduser=User.objects.get(idauth=request.user),
+                iduser=user,
                 idplaylist=play,
                 status="created"
             )
             par = Participated.objects.create(
                 idcollab=coll,
-                iduser=User.objects.get(idauth=request.user)
+                iduser=user
             )
             return redirect('createCollab', coll.idcollab)
 
@@ -599,6 +613,29 @@ def user_context(user, extra=None):
     if extra:
         context.update(extra)
     return context
+
+
+def mailbox(mail_id, action, type, user):
+    if action == 'accept' and type == 'm':
+        fr = Friendship.objects.create(
+            request=Requestfriendship.objects.get(idrf=mail_id)
+        )
+
+    elif action == 'deny' and type == 'm':
+        req = Requestfriendship.objects.get(idrf=mail_id)
+        req.delete()
+
+    elif action == 'accept' and type == 'c':
+        req = Requestcollab.objects.get(idrc=mail_id)
+        fr = Participated.objects.create(
+            iduser=user,
+            idcollab=req.idcollab
+        )
+        req.delete()
+
+    elif action == 'deny' and type == 'c':
+        req = Requestcollab.objects.filter(idrc=mail_id)
+        req.delete()
 
 
 def get_friends_list(user):
@@ -662,12 +699,8 @@ def collabPage(request, id):
             'user': i.iduser.idauth,
         })
         print(i.idsong.name)
-    return render(request, 'collabPage.html', {'collab': collab, 'playlist': playlist, 'users': users, 'status': True, 'count':len(playlist)})
-
-
-import requests
-from django.http import HttpResponse
-from django.shortcuts import render
+    return render(request, 'collabPage.html',
+                  {'collab': collab, 'playlist': playlist, 'users': users, 'status': True, 'count': len(playlist)})
 
 
 def get_spotify_token():
@@ -713,7 +746,13 @@ def add_track(request, id):
             song.artist = request.POST.get("artist")
             song.spotify_id = spotify_id
             song.name = request.POST.get("name")
-            song.duration = request.POST.get("duration")
+
+            dur = int(request.POST.get("duration"))
+            song.duration = dur
+            total_seconds = dur // 1000
+            minutes = total_seconds // 60
+            seconds = total_seconds % 60
+            song.duration_string = f"{minutes}:{seconds:02d}"
             song.imagelink = request.POST.get("imagelink")
             song.link = request.POST.get("link")
             song.save()
@@ -748,9 +787,13 @@ def trending(request):
             photo = random.choice(songs).imagelink
         else:
             photo = ''
-        user = User.objects.filter(idauth=request.user).first()
-        liked = Liked.objects.filter(created=i, iduser=user).count() > 0
-        rated = Rated.objects.filter(created=i, iduser=user).count() > 0
+        if request.user.is_authenticated:
+            user = User.objects.filter(idauth=request.user).first()
+            liked = Liked.objects.filter(created=i, iduser=user).count() > 0
+            rated = Rated.objects.filter(created=i, iduser=user).count() > 0
+        else:
+            liked = False
+            rated = False
         ratings = []
         r = Rated.objects.filter(created=i)
         for rr in r:
@@ -764,6 +807,7 @@ def trending(request):
     return render(request, 'trending.html', {'res': res})
 
 
+@login_required(login_url='loginuser')
 def like(request, id):
     if request.method == "POST":
         created = Created.objects.filter(idplaylist=id).first()
@@ -779,6 +823,7 @@ def like(request, id):
     return redirect('trending')
 
 
+@login_required(login_url='loginuser')
 def rate(request, id):
     if request.method == "POST":
         rating_string = request.POST.get('rating', '')
@@ -815,3 +860,95 @@ def cancelrate(request, id):
         if rated is not None:
             rated.delete()
     return redirect('trending')
+
+
+def ajax_get_friends(request):
+    user = User.objects.get(idauth=request.user)
+    friends = get_friends_list(user)
+    html = ""
+    for friend in friends:
+        html += f"{friend.username}<br>"
+    return HttpResponse(html)
+
+
+def ajax_get_collabs(request):
+    user = User.objects.get(idauth=request.user)
+    participated = Participated.objects.filter(iduser=user)
+    html = ""
+    for p in participated:
+        collab = p.idcollab
+        if collab.idplaylist.name != "":
+            html += f"<a href='/collabPage/{collab.idcollab}' class='playlistlink'>{collab.name}</a><br>"
+    return HttpResponse(html)
+
+
+def ajax_get_messages(request):
+    user = User.objects.get(idauth=request.user)
+    messages = get_messages_list(user)
+    messages = sorted(messages, key=lambda d: d['message'].time, reverse=True)
+    html = ""
+    for mail in messages:
+        if mail['type'] == 'm':
+            html += f"""
+            <form method='post'>
+                <input type='hidden' name='form_type' value='mailbox'>
+                <input type='hidden' name='mail_type' value='m'>
+                <input type='hidden' name='mail_id' value='{mail["message"].idrf}'>
+                {mail["message"].idusersend.idauth.username} sent you a friend request.<br>
+                <button type='submit' name='action' value='accept' class='btn new_request'>Accept</button>
+                <button type='submit' name='action' value='deny' class='btn new_request'>Deny</button>
+            </form>
+            <hr>
+            """
+        elif mail['type'] == 'c':
+            html += f"""
+            <form method='post'>
+                <input type='hidden' name='form_type' value='mailbox'>
+                <input type='hidden' name='mail_type' value='c'>
+                <input type='hidden' name='mail_id' value='{mail["message"].idrc}'>
+                {mail["message"].idusersend.idauth.username} invited you to join a collab.<br>
+                <button type='submit' name='action' value='accept' class='btn new_request'>Accept</button>
+                <button type='submit' name='action' value='deny' class='btn new_request'>Deny</button>
+            </form>
+            <hr>
+            """
+    return HttpResponse(html)
+
+
+@login_required
+def ajax_get_participants(request, collabid):
+    participants = Participated.objects.filter(idcollab_id=collabid)
+    html = ""
+    for p in participants:
+        html += f"{p.iduser.idauth.username}<br>"
+    return HttpResponse(html)
+
+
+@login_required
+def ajax_mailbox_action(request):
+    if request.method == "POST":
+        form_type = request.POST.get("form_type")
+        mail_type = request.POST.get("mail_type")
+        mail_id = request.POST.get("mail_id")
+        action = request.POST.get("action")
+        print(f"=== AJAX MAILBOX ACTION ===")  # DEBUG
+        print(f"form_type: {form_type}")
+        print(f"mail_type: {mail_type}")
+        print(f"mail_id: {mail_id}")
+        print(f"action: {action}")
+
+        if form_type == "mailbox":
+            user = User.objects.get(idauth=request.user)
+            if mail_type == "m":
+                req = Requestfriendship.objects.get(idrf=mail_id)
+                if action == "accept":
+                    friendship = Friendship.objects.create(request=req)
+                else:
+                    req.delete()
+            elif mail_type == "c":
+                req = Requestcollab.objects.get(idrc=mail_id)
+                if action == "accept":
+                    participated = Participated.objects.create(iduser=user, idcollab=req.idcollab)
+                req.delete()
+            return JsonResponse({"ok": True})
+    return JsonResponse({"ok": False}, status=400)

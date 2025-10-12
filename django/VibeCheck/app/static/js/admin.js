@@ -5,6 +5,10 @@ const sectionTitles = {
     'trending': 'Trending Playlists',
     'purchases': 'Purchases'
 };
+document.addEventListener("DOMContentLoaded", function() {
+    const activeSection = window.ACTIVE_SECTION || 'home';
+    showSection(activeSection);
+});
 
 function showSection(sectionName) {
     const allSections = document.querySelectorAll('.section-content');
@@ -32,7 +36,3 @@ function showSection(sectionName) {
         activeNavLink.classList.add('active');
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    showSection('home');
-});
