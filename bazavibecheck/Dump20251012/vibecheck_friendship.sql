@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: vibecheck
+-- Host: localhost    Database: vibecheck
 -- ------------------------------------------------------
--- Server version	8.0.43
+-- Server version	8.0.40
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,30 +16,20 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `participated`
+-- Table structure for table `friendship`
 --
 
-DROP TABLE IF EXISTS `participated`;
+DROP TABLE IF EXISTS `friendship`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `participated` (
-  `iduser` int NOT NULL,
-  `idcollab` int NOT NULL,
-  PRIMARY KEY (`iduser`,`idcollab`),
-  KEY `participated.idcollab_idx` (`idcollab`),
-  CONSTRAINT `participated.idcollab` FOREIGN KEY (`idcollab`) REFERENCES `collab` (`idcollab`),
-  CONSTRAINT `participated.iduser` FOREIGN KEY (`iduser`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `friendship` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `request_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `friendship_ibfk_1` (`request_id`),
+  CONSTRAINT `friendship_ibfk_1` FOREIGN KEY (`request_id`) REFERENCES `requestfriendship` (`idrf`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `participated`
---
-
-LOCK TABLES `participated` WRITE;
-/*!40000 ALTER TABLE `participated` DISABLE KEYS */;
-/*!40000 ALTER TABLE `participated` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -50,4 +40,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-08 14:16:51
+-- Dump completed on 2025-10-12  2:20:25

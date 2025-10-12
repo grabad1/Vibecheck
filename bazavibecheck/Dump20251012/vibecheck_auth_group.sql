@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: vibecheck
+-- Host: localhost    Database: vibecheck
 -- ------------------------------------------------------
--- Server version	8.0.43
+-- Server version	8.0.40
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,35 +16,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `requestcollab`
+-- Table structure for table `auth_group`
 --
 
-DROP TABLE IF EXISTS `requestcollab`;
+DROP TABLE IF EXISTS `auth_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `requestcollab` (
-  `idrc` int NOT NULL AUTO_INCREMENT,
-  `idusersend` int NOT NULL,
-  `iduserrecieve` int NOT NULL,
-  `idcollab` int NOT NULL,
-  PRIMARY KEY (`idrc`),
-  KEY `rc.idusersend_idx` (`idusersend`),
-  KEY `rc.iduserrecieve_idx` (`iduserrecieve`),
-  KEY `rc.idcollab_idx` (`idcollab`),
-  CONSTRAINT `rc.idcollab` FOREIGN KEY (`idcollab`) REFERENCES `collab` (`idcollab`),
-  CONSTRAINT `rc.iduserrecieve` FOREIGN KEY (`iduserrecieve`) REFERENCES `user` (`idUser`),
-  CONSTRAINT `rc.idusersend` FOREIGN KEY (`idusersend`) REFERENCES `user` (`idUser`)
+CREATE TABLE `auth_group` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `requestcollab`
---
-
-LOCK TABLES `requestcollab` WRITE;
-/*!40000 ALTER TABLE `requestcollab` DISABLE KEYS */;
-/*!40000 ALTER TABLE `requestcollab` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -55,4 +39,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-08 14:16:51
+-- Dump completed on 2025-10-12  2:20:23

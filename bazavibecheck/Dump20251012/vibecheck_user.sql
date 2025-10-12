@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: vibecheck
+-- Host: localhost    Database: vibecheck
 -- ------------------------------------------------------
--- Server version	8.0.43
+-- Server version	8.0.40
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,32 +16,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `requestfriendship`
+-- Table structure for table `user`
 --
 
-DROP TABLE IF EXISTS `requestfriendship`;
+DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `requestfriendship` (
-  `idrf` int NOT NULL AUTO_INCREMENT,
-  `idusersend` int NOT NULL,
-  `iduserrecieve` int NOT NULL,
-  PRIMARY KEY (`idrf`),
-  KEY `rf.idusersend_idx` (`idusersend`),
-  KEY `rf.iduserrecieve_idx` (`iduserrecieve`),
-  CONSTRAINT `rf.iduserrecieve` FOREIGN KEY (`iduserrecieve`) REFERENCES `user` (`idUser`),
-  CONSTRAINT `rf.idusersend` FOREIGN KEY (`idusersend`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `user` (
+  `idUser` int NOT NULL AUTO_INCREMENT,
+  `type` varchar(9) NOT NULL,
+  `idauth` int NOT NULL,
+  PRIMARY KEY (`idUser`),
+  KEY `PK_idauth_idx` (`idauth`),
+  CONSTRAINT `PK_idauth` FOREIGN KEY (`idauth`) REFERENCES `auth_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `requestfriendship`
---
-
-LOCK TABLES `requestfriendship` WRITE;
-/*!40000 ALTER TABLE `requestfriendship` DISABLE KEYS */;
-/*!40000 ALTER TABLE `requestfriendship` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -52,4 +41,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-08 14:16:52
+-- Dump completed on 2025-10-12  2:20:23

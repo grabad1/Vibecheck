@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: vibecheck
+-- Host: localhost    Database: vibecheck
 -- ------------------------------------------------------
--- Server version	8.0.43
+-- Server version	8.0.40
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -23,23 +23,19 @@ DROP TABLE IF EXISTS `contains`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `contains` (
+  `id` int NOT NULL AUTO_INCREMENT,
   `idplaylist` int NOT NULL,
   `idsong` int NOT NULL,
-  PRIMARY KEY (`idplaylist`,`idsong`),
-  KEY `contains.idsong_idx` (`idsong`),
-  CONSTRAINT `contains.idplaylist` FOREIGN KEY (`idplaylist`) REFERENCES `playlist` (`idplaylist`),
-  CONSTRAINT `contains.idsong` FOREIGN KEY (`idsong`) REFERENCES `song` (`idsong`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `iduser` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_playlist_song` (`idplaylist`,`idsong`),
+  KEY `contains_ibfk_2` (`idsong`),
+  KEY `contains_ibfk_3` (`iduser`),
+  CONSTRAINT `contains_ibfk_1` FOREIGN KEY (`idplaylist`) REFERENCES `playlist` (`idplaylist`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `contains_ibfk_2` FOREIGN KEY (`idsong`) REFERENCES `song` (`idsong`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `contains_ibfk_3` FOREIGN KEY (`iduser`) REFERENCES `user` (`idUser`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `contains`
---
-
-LOCK TABLES `contains` WRITE;
-/*!40000 ALTER TABLE `contains` DISABLE KEYS */;
-/*!40000 ALTER TABLE `contains` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -50,4 +46,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-08 14:16:51
+-- Dump completed on 2025-10-12  2:20:22
