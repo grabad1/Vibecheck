@@ -109,7 +109,7 @@
                             {{ mail.message.idusersend.idauth.username }} sent you a friend request.
                         {% elif mail.type == 'c' %}
                         <input type="hidden" name="mail_id" value="{{ mail.message.idrc }}">
-                            {{ mail.message.idusersend.idauth.username }} asked you to join their collab.
+                            {{ mail.message.idusersend.idauth.username }} asked you to join a collab.
                         {% endif %}
                         <br>
                         <button type= "submit" class ="btn new_request" name="action" value="accept">Accept</button>

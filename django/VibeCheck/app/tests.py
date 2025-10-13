@@ -204,6 +204,87 @@ class TrendingTests(TestCase):
         self.assertIn(res.status_code, (200, 302))
         self.assertFalse(Rated.objects.filter(created=created).exists())
 
+class ModeratorTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.moderator = create_user('moderator', '123', utype='moderator')
+
+        p = Playlist.objects.create(name='Plejlista1')
+        c = Collab.objects.create(iduser=self.moderator, idplaylist=p)
+        self.created = Created.objects.create(idplaylist=p, iduser=self.moderator, trending=1)
+        p2 = Playlist.objects.create(name='Plejlista2')
+        c = Collab.objects.create(iduser=self.moderator, idplaylist=p2)
+        self.created2 = Created.objects.create(idplaylist=p2, iduser=self.moderator, trending=0)
+
+    def test_moderator_get(self):
+        self.client.login(username='moderator', password='123')
+        res = self.client.get(reverse('moderator'))
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'moderator.html')
+
+    def test_moderator_post_trending_delete(self):
+        self.client.login(username='moderator', password='123')
+        res = self.client.post(reverse('moderator'),
+                               {'form_type': 'myPlaylists', 'action': 'remove', 'created': self.created.id})
+        self.assertIn(res.status_code, (200, 302))
+        c = Created.objects.get(id=self.created.id)
+        self.assertEqual(c.trending, 0)
+
+    def test_moderator_post_trending_upload(self):
+        self.client.login(username='moderator', password='123')
+        res = self.client.post(reverse('moderator'),
+                               {'form_type': 'myPlaylists', 'action': 'upload', 'created': self.created2.id})
+        self.assertIn(res.status_code, (200, 302))
+        c = Created.objects.get(id=self.created.id)
+        self.assertEqual(c.trending, 1)
+
+    def test_moderator_edit(self):
+        self.client.login(username='moderator', password='123')
+        res = self.client.post(reverse('moderator'),
+                               {'form_type': 'myPlaylists', 'action': 'edit', 'created': self.created2.id})
+        self.assertIn(res.status_code, (200, 302))
+        self.assertIn('makePlaylist', res.url)
+
+    def test_moderator_create(self):
+        self.client.login(username='moderator', password='123')
+        res = self.client.post(reverse('moderator'), {'form_type': 'createPlaylist', 'name': 'Plejlista'})
+        self.assertIn(res.status_code, (200, 302))
+        self.assertIn('makePlaylist', res.url)
+
+class PremiumTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = create_user('user', '123')
+
+    def test_pricing_get(self):
+        res = self.client.get(reverse('pricing'))
+        self.assertEqual(res.status_code, 200)
+
+    def test_pricing_post_redirect_authenticated(self):
+        self.client.login(username='user', password='123')
+        res = self.client.post(reverse('pricing'))
+        self.assertIn(res.status_code, (200, 302))
+
+    def test_checkout_post_authenticated(self):
+        self.client.login(username='user', password='123')
+        res = self.client.post(reverse('checkout'))
+        user = User.objects.get(idauth=self.user.idauth)
+        self.assertEqual(user.type, 'premium')
+
+
+class CollabTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = create_user('user', '123')
+        self.client.login(username='user', password='123')
+
+    def test_createCollab_get(self):
+        pl = Playlist.objects.create(name='Plejlista')
+        coll = Collab.objects.create(name='Collab', iduser=self.user, idplaylist=pl, status='created')
+        p = Participated.objects.create(idcollab=coll, iduser=self.user)
+        res = self.client.get(reverse('createCollab', args=[coll.idcollab]))
+        self.assertEqual(res.status_code, 200)
+
 
 class FunctionalTestCase(StaticLiveServerTestCase):
     def setUp(self):
@@ -562,3 +643,267 @@ class AdminFunctionalTestCase(FunctionalTestCase):
         submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="remove"]')
         submit_btn.click()
         time.sleep(2)
+
+class CreateCollabFunctionalTestCase(FunctionalTestCase):
+
+    def test_accept_collab_request(self):
+        user1, user2, _ = self.create_test_users()
+
+        pl = Playlist.objects.create()
+        collab = Collab.objects.create(
+            iduser=user1,
+            idplaylist=pl,
+            status='created'
+        )
+        Participated.objects.create(
+            iduser=user2,
+            idcollab=collab
+        )
+
+        request = Requestcollab.objects.create(
+            idusersend=user1,
+            iduserrecieve=user2,
+            idcollab=collab
+        )
+
+        self.login_user('masa', '123')
+
+        self.assertIn('dusan', self.browser.page_source)
+        self.assertIn('join a collab', self.browser.page_source)
+
+        accept_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="accept"]')
+        accept_btn.click()
+
+        time.sleep(3)
+
+        self.assertEqual(Requestcollab.objects.count(), 0)
+        self.assertEqual(Participated.objects.count(), 2)
+
+    def test_deny_collab_request(self):
+        user1, user2, _ = self.create_test_users()
+
+        pl = Playlist.objects.create()
+        collab = Collab.objects.create(
+            iduser=user1,
+            idplaylist=pl,
+            status='created'
+        )
+        Participated.objects.create(
+            iduser=user2,
+            idcollab=collab
+        )
+
+        request = Requestcollab.objects.create(
+            idusersend=user1,
+            iduserrecieve=user2,
+            idcollab=collab
+        )
+
+        self.login_user('masa', '123')
+
+        self.assertIn('dusan', self.browser.page_source)
+        self.assertIn('join a collab', self.browser.page_source)
+
+        deny_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="deny"]')
+        deny_btn.click()
+
+        time.sleep(3)
+        self.assertEqual(Requestcollab.objects.count(), 0)
+
+    def test_create_new_collab(self):
+        user1, _, _ = self.create_test_users()
+        self.login_user('dusan', '123')
+
+        create_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.new_collab')
+        create_btn.click()
+
+        time.sleep(2)
+
+        self.assertIn('/createCollab/', self.browser.current_url)
+
+        time.sleep(3)
+        self.assertEqual(Collab.objects.filter(status='created').count(), 1)
+        collab = Collab.objects.first()
+        self.assertEqual(collab.iduser, user1)
+        self.assertEqual(Participated.objects.filter(idcollab=collab).count(), 1)
+
+    def test_invite_friend_to_collab(self):
+        user1, user2, _ = self.create_test_users()
+
+        req = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user2)
+        Friendship.objects.create(request=req)
+
+        self.login_user('dusan', '123')
+
+        create_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.new_collab')
+        create_btn.click()
+
+        time.sleep(2)
+
+        self.assertIn('masa', self.browser.page_source)
+
+        add_friend_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.addfriend')
+        add_friend_btn.click()
+
+        time.sleep(3)
+
+        self.assertEqual(Requestcollab.objects.count(), 1)
+        invite = Requestcollab.objects.first()
+        self.assertEqual(invite.idusersend, user1)
+        self.assertEqual(invite.iduserrecieve, user2)
+
+    def test_start_collab_with_name(self):
+        user1, user2, _ = self.create_test_users()
+
+        req = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user2)
+        Friendship.objects.create(request=req)
+
+        playlist = Playlist.objects.create(name='')
+        collab = Collab.objects.create(
+            iduser=user1,
+            idplaylist=playlist,
+            status='created'
+        )
+        Participated.objects.create(iduser=user1, idcollab=collab)
+        Participated.objects.create(iduser=user2, idcollab=collab)
+
+        self.login_user('dusan', '123')
+
+        self.browser.get(f'{self.appUrl}/createCollab/{collab.idcollab}')
+        time.sleep(2)
+
+        name_input = self.browser.find_element(By.NAME, 'name')
+        name_input.send_keys('Summer Vibes 2024')
+
+        start_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.new_collab')
+        start_btn.click()
+
+        time.sleep(2)
+
+        self.assertIn('/collabPage/', self.browser.current_url)
+
+        collab.refresh_from_db()
+        self.assertEqual(collab.status, 'active')
+        self.assertEqual(collab.name, 'Summer Vibes 2024')
+
+    def test_start_collab_without_name(self):
+        user1, user2, _ = self.create_test_users()
+
+        req = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user2)
+        Friendship.objects.create(request=req)
+
+        playlist = Playlist.objects.create(name='')
+        collab = Collab.objects.create(
+            iduser=user1,
+            idplaylist=playlist,
+            status='created'
+        )
+        Participated.objects.create(iduser=user1, idcollab=collab)
+        Participated.objects.create(iduser=user2, idcollab=collab)
+
+        self.login_user('dusan', '123')
+
+        self.browser.get(f'{self.appUrl}/createCollab/{collab.idcollab}')
+        time.sleep(2)
+
+        name_input = self.browser.find_element(By.NAME, 'name')
+        name_input.send_keys('')
+
+        start_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.new_collab')
+        start_btn.click()
+
+        time.sleep(2)
+
+        self.assertIn('You have to enter', self.browser.page_source)
+
+    def test_collab_limit_three_people(self):
+        user1, user2, user3 = self.create_test_users()
+
+        django_user4 = djangoUser.objects.create_user(username='pera', password='123')
+        user4 = User.objects.create(idauth=django_user4, type='regular')
+        django_user5 = djangoUser.objects.create_user(username='zika', password='123')
+        user5 = User.objects.create(idauth=django_user5, type='regular')
+
+        req1 = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user2)
+        Friendship.objects.create(request=req1)
+        req2 = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user3)
+        Friendship.objects.create(request=req2)
+        req3 = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user4)
+        Friendship.objects.create(request=req3)
+        req3 = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user5)
+        Friendship.objects.create(request=req3)
+
+        self.login_user('dusan', '123')
+
+        create_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.new_collab')
+        create_btn.click()
+        time.sleep(2)
+
+        add_buttons = self.browser.find_elements(By.CSS_SELECTOR, 'button.addfriend')
+
+        for i in range(min(3, len(add_buttons))):
+            add_buttons = self.browser.find_elements(By.CSS_SELECTOR, 'button.addfriend')
+            add_buttons[0].click()
+            time.sleep(1)
+
+        time.sleep(2)
+        add_buttons = self.browser.find_elements(By.CSS_SELECTOR, 'button.addfriend')
+
+        if add_buttons:
+            add_buttons[0].click()
+            time.sleep(2)
+
+            self.assertIn('maximum of 3 people', self.browser.page_source)
+
+    def test_collab_limit_five_total(self):
+        user1, _, _ = self.create_test_users()
+
+        for i in range(5):
+            pl = Playlist.objects.create()
+            collab = Collab.objects.create(iduser=user1, idplaylist=pl, status='active', name="Playlist " + str(i))
+            Participated.objects.create(iduser=user1, idcollab=collab)
+        self.login_user('dusan', '123')
+        create_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.new_collab')
+        create_btn.click()
+
+        time.sleep(2)
+
+        self.assertIn('maximum of 5 collabs', self.browser.page_source)
+
+class TrendingFunctionalTestCase(FunctionalTestCase):
+
+    def test_view_trending_page(self):
+        user1, _, _ = self.create_test_users()
+
+        pl = Playlist.objects.create(name='Top Hits 2024')
+        Created.objects.create(iduser=user1, idplaylist=pl, trending=1)
+
+        self.login_user('dusan', '123')
+
+        trending_link = self.browser.find_element(By.LINK_TEXT, 'Trending')
+        trending_link.click()
+
+        time.sleep(2)
+
+        self.assertIn('/trending', self.browser.current_url)
+        self.assertIn('Top Hits 2024', self.browser.page_source)
+
+    def test_like_playlist(self):
+        user1, user2, _ = self.create_test_users()
+
+        pl = Playlist.objects.create(name='Chill Vibes')
+        created = Created.objects.create(iduser=user1, idplaylist=pl, trending=1)
+
+        self.login_user('masa', '123')
+
+        self.browser.get(f'{self.appUrl}/trending/')
+        time.sleep(2)
+
+        like_btn = self.browser.find_element(By.CSS_SELECTOR, 'button.like-btn')
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", like_btn)
+        time.sleep(2)
+        like_btn.click()
+
+        time.sleep(2)
+
+        self.assertEqual(Liked.objects.filter(created=created).count(), 1)
