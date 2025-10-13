@@ -17,7 +17,7 @@
         <!-- u sledecem redu ce action da se promeni na onaj path kome je zahtev upucen rest zahtev za signup -->
         <form class="signup-form mx-auto px-3"  method="post">
             {%csrf_token%}
-            <a href="index.html"><img class="mb-4" src="../static/images/logo.png" width="200px" alt = "Logo"></a>
+            <a href="{% url 'index' %}"><img class="mb-4" src="../static/images/logo.png" width="200px" alt = "Logo"></a>
             <p class="mb-4 fw-normal h1-shadow">Sign up!</p>
             
             <div>

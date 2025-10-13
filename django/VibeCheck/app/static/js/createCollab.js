@@ -110,6 +110,4 @@ $(document).ready(function(){
         refreshParticipants();
         refreshFriendsList();
     }, 5000);
-    refreshParticipants();
-    refreshFriendsList();
 });

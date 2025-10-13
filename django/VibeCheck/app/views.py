@@ -49,7 +49,7 @@ def loginuser(request):
                 request.session.set_expiry(60 * 60 * 24 * 30)
             else:
                 request.session.set_expiry(0)
-            user_obj = User.objects.get(idauth=user.id)
+            user_obj = User.objects.get(idauth=user)
             user_type = user_obj.type
             if user_type in ('regular', 'premium'):
                 return redirect('user')
@@ -103,11 +103,11 @@ def signup(request):
         email = request.POST['email']
         user_type = 'regular'
 
-        if DjangoUser.objects.filter(username=username).exists():
+        if djangoUser.objects.filter(username=username).exists():
             mess = "Korisnik već postoji"
             return render(request, 'signup.html', {'mess': mess})
 
-        django_user = DjangoUser.objects.create_user(
+        django_user = djangoUser.objects.create_user(
             username=username,
             email=email,
             password=password
@@ -457,7 +457,7 @@ def moderator(request):
         if form_type == 'createPlaylist':
             name = request.POST.get('name', '').strip()
             if name == '':
-                mess = "You have to enter name for the collab!"
+                mess = "You have to enter name for the playlist!"
                 return render(request, 'moderator.html', {'mess': mess, 'active_section': 'createPlaylist'})
             play = Playlist.objects.create(name=name)
             created = Created.objects.create(
@@ -625,7 +625,7 @@ def user_context(user, extra=None):
     participated = Participated.objects.filter(iduser=user)
     collabs = []
     for part in participated:
-        if part.idcollab.idplaylist.name != "":
+        if part.idcollab.status != 'created':
             collabs.append(part.idcollab)
     friends = get_friends_list(user)
     messages = get_messages_list(user)
@@ -721,7 +721,6 @@ def collabPage(request, id):
             'song': i.idsong,
             'user': i.iduser.idauth,
         })
-        print(i.idsong.name)
     return render(request, 'collabPage.html',
                   {'collab': collab, 'playlist': playlist, 'users': users, 'status': True, 'count': len(playlist)})
 
@@ -907,7 +906,7 @@ def ajax_get_collabs(request):
     html = ""
     for p in participated:
         collab = p.idcollab
-        if collab.idplaylist.name != "":
+        if collab.status != 'created':
             html += f"<a href='/collabPage/{collab.idcollab}' class='playlistlink'>{collab.name}</a><br>"
     return HttpResponse(html)
 
@@ -961,11 +960,6 @@ def ajax_mailbox_action(request):
         mail_type = request.POST.get("mail_type")
         mail_id = request.POST.get("mail_id")
         action = request.POST.get("action")
-        print(f"=== AJAX MAILBOX ACTION ===")  # DEBUG
-        print(f"form_type: {form_type}")
-        print(f"mail_type: {mail_type}")
-        print(f"mail_id: {mail_id}")
-        print(f"action: {action}")
 
         if form_type == "mailbox":
             user = User.objects.get(idauth=request.user)
