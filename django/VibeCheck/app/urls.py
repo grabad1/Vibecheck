@@ -31,4 +31,5 @@ urlpatterns = [
     path('ajax/participants/<int:collabid>/', ajax_get_participants, name='ajax_participants'),
     path('ajax/mailbox-action/', ajax_mailbox_action, name='ajax_mailbox_action'),
     path('ajax/friends-collab/<int:collabid>/', ajax_friends_collab, name='ajax_friends_collab'),
+    path('already_premium/', already_premium, name='already_premium'),
 ]

@@ -1,3 +1,5 @@
+from operator import truediv
+
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.models import User as djangoUser
 from django.contrib.auth.decorators import login_required
@@ -139,8 +141,7 @@ def checkout(request):
             user.save()
             return redirect('successful_payment')
         else:
-            context = {"mess": "Error: Purchase failed!"}
-            return render('checkout', context)
+            return redirect('login')
     return render(request, 'checkout.html')
 
 
@@ -325,6 +326,15 @@ def admin(request):
 def pricing(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
+            user = User.objects.get(idauth=request.user.id)
+            p = Purchased.objects.filter(iduser=user)
+            already = False
+            for i in p:
+                if (i.date.date() + timedelta(days=30) >= datetime.now().date()):
+                    already = True
+                    break
+            if already:
+                return redirect('already_premium')
             return redirect('checkout')
         else:
             return redirect('loginuser')
@@ -976,3 +986,19 @@ def ajax_mailbox_action(request):
                 req.delete()
             return JsonResponse({"ok": True})
     return JsonResponse({"ok": False}, status=400)
+
+
+@login_required(login_url='loginuser')
+def already_premium(request):
+    user = User.objects.get(idauth=request.user.id)
+    p = Purchased.objects.filter(iduser=user)
+    expiry_date = None
+    purchase_date = None
+    left = None
+    for i in p:
+        if (i.date.date() + timedelta(days=30) >= datetime.now().date()):
+            purchase_date = i.date
+            expiry_date = i.date + timedelta(days=30)
+            left = (expiry_date.date() - datetime.now().date()).days
+            break
+    return render(request, "already_premium.html", {"purchase_date": purchase_date, "expiry_date": expiry_date, "left": left})
