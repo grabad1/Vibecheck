@@ -1,5 +1,12 @@
+import time
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase, Client
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 from django.urls import reverse
+import json
+from django.contrib.auth.models import User as djangoUser
 from .models import *
 
 
@@ -82,3 +89,232 @@ class AdminTests(TestCase):
 
 
 
+class FunctionalTestCase(StaticLiveServerTestCase):
+    def setUp(self):
+        self.browser = webdriver.Firefox()
+        self.appUrl = self.live_server_url
+
+    def tearDown(self):
+        self.browser.close()
+
+    def create_test_users(self):
+        django_user1 = djangoUser.objects.create_user(username='dusan', password='123')
+        user1 = User.objects.create(idauth=django_user1, type='regular')
+
+        django_user2 = djangoUser.objects.create_user(username='masa', password='123')
+        user2 = User.objects.create(idauth=django_user2, type='regular')
+
+        django_user3 = djangoUser.objects.create_user(username='nikola', password='123')
+        user3 = User.objects.create(idauth=django_user3, type='regular')
+
+        return user1, user2, user3
+
+    def login_user(self, username, password):
+        self.browser.get(self.appUrl)
+
+        login_btn = self.browser.find_element(By.CLASS_NAME, 'login-btn')
+        login_btn.click()
+
+        username_field = self.browser.find_element(By.NAME, 'username')
+        username_field.send_keys(username)
+
+        password_field = self.browser.find_element(By.NAME, 'password')
+        password_field.send_keys(password)
+
+        login_submit = self.browser.find_element(By.ID, 'login')
+        login_submit.click()
+
+        time.sleep(2)
+
+
+class LoginAndPasswordFunctionalTestCase(FunctionalTestCase):
+
+    def test_login_admin(self):
+        django_user1 = djangoUser.objects.create_user(username='admin', password='123')
+        user1 = User.objects.create(idauth=django_user1, type='admin')
+        self.browser.get(self.appUrl)
+
+        login_btn = self.browser.find_element(By.CLASS_NAME, 'login-btn')
+        login_btn.click()
+
+        username_field = self.browser.find_element(By.NAME, 'username')
+        username_field.send_keys('admin')
+
+        password_field = self.browser.find_element(By.NAME, 'password')
+        password_field.send_keys('123')
+
+        login_submit = self.browser.find_element(By.ID, 'login')
+        login_submit.click()
+
+        time.sleep(2)
+
+        self.assertIn('Dashboard', self.browser.page_source)
+
+    def test_login_moderator(self):
+        django_user1 = djangoUser.objects.create_user(username='moderator', password='123')
+        user1 = User.objects.create(idauth=django_user1, type='moderator')
+        self.browser.get(self.appUrl)
+
+        login_btn = self.browser.find_element(By.CLASS_NAME, 'login-btn')
+        login_btn.click()
+
+        username_field = self.browser.find_element(By.NAME, 'username')
+        username_field.send_keys('moderator')
+
+        password_field = self.browser.find_element(By.NAME, 'password')
+        password_field.send_keys('123')
+
+        login_submit = self.browser.find_element(By.ID, 'login')
+        login_submit.click()
+
+        time.sleep(2)
+
+        self.assertIn('Dashboard', self.browser.page_source)
+
+    def test_change_password(self):
+        django_user = djangoUser.objects.create_user(username='testuser', password='oldpass')
+        User.objects.create(idauth=django_user, type='regular')
+
+        self.login_user('testuser', 'oldpass')
+
+        dropdown = self.browser.find_element(By.CLASS_NAME, 'dropdown-toggle')
+        dropdown.click()
+
+        time.sleep(1)
+
+        change_pass_link = self.browser.find_element(By.LINK_TEXT, 'Change password')
+        change_pass_link.click()
+
+        time.sleep(2)
+
+        old_pass = self.browser.find_element(By.NAME, 'old')
+        old_pass.send_keys('oldpass')
+
+        new_pass = self.browser.find_element(By.NAME, 'new')
+        new_pass.send_keys('newpass123')
+
+        confirm_pass = self.browser.find_element(By.NAME, 'confirm')
+        confirm_pass.send_keys('newpass123')
+
+        submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+        submit_btn.click()
+
+        time.sleep(2)
+
+        self.assertIn('successful', self.browser.current_url.lower())
+
+class FriendshipFunctionalTestCase(FunctionalTestCase):
+
+    def test_add_friend(self):
+        user1, user2, _ = self.create_test_users()
+        self.login_user('dusan', '123')
+        add = self.browser.find_element(By.ID, 'addfr')
+        add.click()
+        time.sleep(5)
+        inputname = self.browser.find_element(By.NAME, 'username')
+        inputname.send_keys('masa')
+        addfriend = self.browser.find_element(By.ID, 'addfriend')
+        addfriend.click()
+
+        time.sleep(2)
+
+        self.assertEqual(Requestfriendship.objects.count(), 1)
+        request = Requestfriendship.objects.first()
+        self.assertEqual(request.idusersend, user1)
+        self.assertEqual(request.iduserrecieve, user2)
+
+    def test_accept_friend_request(self):
+        user1, user2, _ = self.create_test_users()
+
+        request = Requestfriendship.objects.create(
+            idusersend=user1,
+            iduserrecieve=user2
+        )
+
+        self.login_user('masa', '123')
+
+        self.assertIn('dusan', self.browser.page_source)
+        self.assertIn('friend request', self.browser.page_source)
+
+        accept_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="accept"]')
+        accept_btn.click()
+
+        time.sleep(3)
+
+        self.assertEqual(Friendship.objects.count(), 1)
+
+    def test_deny_friend_request(self):
+        user1, user2, _ = self.create_test_users()
+
+        request = Requestfriendship.objects.create(
+            idusersend=user1,
+            iduserrecieve=user2
+        )
+
+        self.login_user('masa', '123')
+
+        self.assertIn('dusan', self.browser.page_source)
+        self.assertIn('friend request', self.browser.page_source)
+
+        deny_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="deny"]')
+        deny_btn.click()
+
+        time.sleep(2)
+
+        self.assertEqual(Requestfriendship.objects.count(), 0)
+        self.assertEqual(Friendship.objects.count(), 0)
+
+class ModeratorFunctionalTestCase(FunctionalTestCase):
+
+    def test_moderator_create_playlist(self):
+        django_user1 = djangoUser.objects.create_user(username='moderator', password='123')
+        user1 = User.objects.create(idauth=django_user1, type='moderator')
+        self.login_user('moderator', '123')
+        link = self.browser.find_element(By.LINK_TEXT, 'Create Playlist')
+        link.click()
+        name = self.browser.find_element(By.NAME, 'name')
+        name.send_keys("Car Mix")
+        submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+        submit_btn.click()
+        time.sleep(2)
+        self.assertIn('/makePlaylist', self.browser.current_url)
+
+    def test_moderator_myplaylist_upload(self):
+        django_user1 = djangoUser.objects.create_user(username='moderator', password='123')
+        user = User.objects.create(idauth=django_user1, type='moderator')
+
+        pl = Playlist.objects.create(name="Plejlista")
+        Created.objects.create(
+            iduser=user,
+            idplaylist=pl
+        )
+        self.login_user('moderator', '123')
+
+        link = self.browser.find_element(By.LINK_TEXT, 'My Playlists')
+        link.click()
+        time.sleep(5)
+        submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="upload"]')
+        submit_btn.click()
+        time.sleep(2)
+        self.assertIn('Remove', self.browser.page_source)
+
+    def test_moderator_remove_from_trending(self):
+        django_user1 = djangoUser.objects.create_user(username='moderator', password='123')
+        user = User.objects.create(idauth=django_user1, type='moderator')
+
+        pl = Playlist.objects.create(name="Plejlista")
+        Created.objects.create(
+            iduser=user,
+            idplaylist=pl,
+            trending=1
+        )
+        self.login_user('moderator', '123')
+
+        link = self.browser.find_element(By.LINK_TEXT, 'Edit Trending')
+        link.click()
+        time.sleep(5)
+        submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="remove"]')
+        submit_btn.click()
+        time.sleep(2)
+        trending = Created.objects.filter(trending=1).count()
+        self.assertEqual(trending, 0)
