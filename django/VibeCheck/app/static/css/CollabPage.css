@@ -462,11 +462,12 @@ html, body {
   }
 }
 #login {
-  font-size: 25px;
+    font-size: clamp(2.5rem, 2vw, 1rem);
 }
 
 .gradient-btn {
   background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+  font-family: "Jersey 15", sans-serif;
   background-size: 400% 400%;
   animation: gradientMove 10s ease infinite;
   border: none;
