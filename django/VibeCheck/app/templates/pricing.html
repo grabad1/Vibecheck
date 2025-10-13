@@ -12,8 +12,22 @@
 
     <title>Pricing</title>
     <link href="{% static 'css/pricing.css' %}" rel="stylesheet">
+    <style>.exit {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    color: red;
+    text-decoration: none;
+    z-index: 1000;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+}</style>
 </head>
 <body>
+<a href="{% url 'index' %}" class="exit">
+    &times;
+  </a>
     <div class="container py-3">
         <header>
             <div class="d-flex flex-column flex-md-row align-items-center pb-3border-bottom">
