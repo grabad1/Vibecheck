@@ -1,10 +1,7 @@
-from multiprocessing.connection import Client
-from unittest import TestCase
-
+from django.test import TestCase, Client
 from django.urls import reverse
+from .models import *
 
-from app.models import *
-from django.contrib.auth.models import User as djangoUser
 
 
 def create_user(username='user', password='123', email='user@gmail.com', utype='regular'):
@@ -82,4 +79,6 @@ class AdminTests(TestCase):
     def test_admin_remove(self):
         res = self.client.post(reverse('admin'), {'form_type': 'users', 'action': 'remove', 'userid': self.user.iduser})
         self.assertIn(res.status_code, (200, 302))
+
+
 
