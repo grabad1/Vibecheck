@@ -1,0 +1,102 @@
+
+        .w70 {
+            width: 70%;
+        }
+
+        .mali-logo {
+            width: 80px;
+        }
+
+        .pixel-text {
+            font-family: "Jersey 15", sans-serif;
+        }
+
+        .small-vibe, .small-check {
+            font-family: "Jersey 15", sans-serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+            background-size: 600% 600%;
+            animation: gradientMove 12s linear infinite reverse;
+
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 2px 0px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .vibe-text {
+            font-family: "Jersey 15", sans-serif;
+            font-size: clamp(6rem, 12vw, 8rem);
+            background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+            background-size: 600% 600%;
+            animation: gradientMove 12s linear infinite reverse;
+
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+
+            text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .section-title {
+            font-family: "Jersey 15", sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ade80, #facc15, #ff6ec4);
+            background-size: 600% 600%;
+            animation: gradientMove 12s linear infinite reverse;
+
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .exit {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: red;
+            text-decoration: none;
+            z-index: 1000;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+
+        .accordion-button {
+            font-family: "Jersey 15", sans-serif;
+            font-size: 1.5rem;
+            background-color: #f8f9fa;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+            background-size: 400% 400%;
+            animation: gradientMove 12s ease infinite;
+            color: white;
+        }
+
+        .accordion-button:focus {
+            box-shadow: 0 0 0 0.25rem rgba(120, 115, 245, 0.25);
+        }
+
+        .accordion-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .w70 {
+                width: 95%;
+            }
+        }

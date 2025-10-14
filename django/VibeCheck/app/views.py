@@ -869,8 +869,13 @@ def collabPage(request, id):
             'song': i.idsong,
             'user': i.iduser.idauth,
         })
+    user = User.objects.filter(idauth=request.user).first()
+    status=True
+    if user is not None:
+        if user.type == 'admin' or user.type == 'moderator':
+            status = False
     return render(request, 'collabPage.html',
-                  {'collab': collab, 'playlist': playlist, 'users': users, 'status': True, 'count': len(playlist)})
+                  {'collab': collab, 'playlist': playlist, 'users': users, 'status': status, 'count': len(playlist)})
 
 
 def get_spotify_token():
@@ -1207,3 +1212,6 @@ def already_premium(request):
             left = (expiry_date.date() - datetime.now().date()).days
             break
     return render(request, "already_premium.html", {"purchase_date": purchase_date, "expiry_date": expiry_date, "left": left})
+
+def help(request):
+    return render(request, "help.html")
