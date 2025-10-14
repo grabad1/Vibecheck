@@ -76,7 +76,7 @@
                                 <p>By {{ r.user.idauth.username }}</p>
                               </div>
                             <div class="pom">
-                                <a href="{% url 'viewPlaylist' r.playlist.idplaylist %}"><button class="gradientt-btn">Check out!</button></a>
+                                <a class="aa" href="{% url 'viewPlaylist' r.playlist.idplaylist %}"><button class="gradientt-btn">Check out!</button></a>
 
                                 </div><div class="playlist-actions">
                                   <form method="post" action="{% url 'like' r.playlist.idplaylist %}">
