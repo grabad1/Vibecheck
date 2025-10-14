@@ -1,4 +1,5 @@
 
+//Nikola Simikić 2022/0281
 const sectionTitles = {
     'home': 'Dashboard',
     'users': 'User Management',

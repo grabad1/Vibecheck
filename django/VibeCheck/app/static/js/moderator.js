@@ -1,4 +1,4 @@
-
+//Maša Cvetanovski 2022/0128
 const sectionTitles = {
     'home': 'Dashboard',
     'trending': 'Edit trending',

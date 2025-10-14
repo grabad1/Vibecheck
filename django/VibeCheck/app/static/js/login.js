@@ -1,4 +1,6 @@
-window.onload = function () { 
+
+//Nikola Simikić 2022/0281
+window.onload = function () {
     const remembered = localStorage.getItem("remember-me")==="true";
     if(remembered) {
         document.getElementById("username").value = localStorage.getItem("username") || "";

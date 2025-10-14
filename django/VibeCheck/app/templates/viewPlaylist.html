@@ -216,6 +216,15 @@
                     </li>
                 </ul>
             </div>
+            {%else%}
+            <div class="items">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a href="{% url 'loginuser' %}" class="nav-link active">Log in</a>
+                    </li>
+                </ul>
+
+            </div>
             {% endif %}
         </header>
 

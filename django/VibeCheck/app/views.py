@@ -1,3 +1,6 @@
+#Maša Cvetanovski 2022/0128
+#Nikola Simikić 2022/0281
+#Dušan Grabović 2022/0099
 from operator import truediv
 
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
@@ -452,7 +455,7 @@ def createCollab(request, collabid):
                         'ok': False,
                         'error': 'As a regular user, you can add a maximum of 3 people.'
                     })
-                mess = "As a regular user, you can add a maximum of 3 people."
+                mess = 'As a regular user, you can add a maximum of 3 people.'
                 context = createCollab_context(user, collabid, {'mess': mess})
                 return render(request, 'createCollab.html', context)
             friend_id = request.POST.get('friend_id')
@@ -702,6 +705,10 @@ def userpage(request):
 
         if form_type == 'friend_request':
             username = request.POST['username']
+            if username == request.user.username:
+                mess = "You cannot send request to yourself!"
+                context = user_context(user, {'mess': mess})
+                return render(request, 'user.html', context)
             try:
                 userr = djangoUser.objects.get(username=username)
             except:

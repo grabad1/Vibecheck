@@ -1,5 +1,7 @@
 
-// animcije za fade out
+//Dušan Grabović 2022/0099
+
+// animacije za fade out
 gsap.registerPlugin(ScrollTrigger);
 
 gsap.timeline({

@@ -1,3 +1,6 @@
+#Maša Cvetanovski 2022/0128
+#Nikola Simikić 2022/0281
+#Dušan Grabović 2022/0099
 from django.db import models
 from django.contrib.auth.models import User as djangoUser
 

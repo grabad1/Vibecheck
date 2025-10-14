@@ -1,3 +1,5 @@
+
+//Nikola Simikić 2022/0281
 gsap.registerPlugin(ScrollTrigger);
 
 // dodavanje random slike umesto miach

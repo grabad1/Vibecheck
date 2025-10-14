@@ -75,9 +75,9 @@ WSGI_APPLICATION = 'VibeCheck.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vibecheck4',
+        'NAME': 'vibecheck',
         'USER': 'root',
-        'PASSWORD': 'Dusan123!',
+        'PASSWORD': 'root123',
         'HOST': '127.0.0.1',
         'PORT': '3306'
     }

@@ -1,3 +1,7 @@
+#Maša Cvetanovski 2022/0128
+#Nikola Simikić 2022/0281
+#Dušan Grabović 2022/0099
+
 from datetime import datetime
 import time
 
@@ -424,7 +428,7 @@ class CollabTests(TestCase):
                                {'form_type': 'friends', 'friend_id': user1.iduser})
         self.assertEqual(res.status_code, 200)
         self.assertEquals(Requestcollab.objects.filter(idcollab=coll).count(), 3)
-        self.assertContains(res, "As a regular user, you can add a maximum of 3 people", html=True)
+        self.assertContains(res, 'As a regular user, you can add a maximum of 3 people.', html=True)
 
     def test_invite_unlimited_friends_premium(self):
         self.user.type = 'premium'
@@ -682,7 +686,7 @@ class LoginAndPasswordFunctionalTestCase(FunctionalTestCase):
         login_submit = self.browser.find_element(By.ID, 'login')
         login_submit.click()
 
-        time.sleep(2)
+        time.sleep(3)
 
         self.assertIn('Dashboard', self.browser.page_source)
 

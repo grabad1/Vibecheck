@@ -1,3 +1,4 @@
+//Maša Cvetanovski 2022/0128
 $(document).ready(function(){
 
     function getCSRFToken() {
