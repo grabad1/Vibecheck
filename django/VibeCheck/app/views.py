@@ -12,6 +12,17 @@ from .models import *
 
 
 def index(request):
+    """
+    Landing stranica aplikacije.
+
+    Ako je korisnik autentifikovan, proverava njegov tip i status premium
+    pretplate. Ako je premium korisnik i njegova pretplata je istekla,
+    vraća ga na regularni status. Zatim ga preusmerava na
+    odgovarajuci dashboard prema njegovom tipu (user, moderator, admin).
+    Ako nije autentifikovan, prikazuje landing stranicu.
+    **Template**:
+    :template:`index.html`
+    """
     if request.user.is_authenticated:
         user = User.objects.get(idauth=request.user)
         user_type = user.type
@@ -32,6 +43,16 @@ def index(request):
 
 
 def loginuser(request):
+    """
+    Stranica i logika za prijavu korisnika.
+
+    Ako je POST zahtev, proverava kredencijale i prijavljuje korisnika.
+    Ako je oznacena opcija "remember me", sesiji se postavlja 30-dnevni
+    rok isteka. Nakon uspesne prijave, korisnik se preusmerava na
+    odgovarajuci dashboard prema njegovom tipu.
+    **Template**:
+    :template:`login.html`
+    """
     if request.user.is_authenticated:
         return redirect('user')
     if request.method == 'POST':
@@ -68,6 +89,15 @@ def loginuser(request):
 
 
 def passwordChange(request):
+    """
+    Stranica i logika za promenu lozinke korisnika.
+
+    Zahteva od korisnika da unese staru lozinku (za verifikaciju),
+    novu lozinku i potvrdu nove lozinke. Nakon uspesne promene,
+    korisnik ostaje prijavljen sa novom lozinkom.
+    **Template**:
+    :template:`passwordChange.html`
+    """
     if request.method == 'POST':
         old = request.POST['old']
         new = request.POST['new']
@@ -92,10 +122,25 @@ def passwordChange(request):
 
 
 def successful_password_change(request):
+    """
+    Stranica za potvrdu uspesne promene lozinke.
+    **Template**:
+    :template:`successful_password_change.html`
+    """
     return render(request, 'successful_password_change.html')
 
 
 def signup(request):
+    """
+    Stranica i logika za registraciju novog korisnika.
+
+    Proverava da li korisnik sa datim korisnickim imenom vec postoji.
+    Ako ne, kreira novog Django korisnika i povezanu User instancu
+    sa 'regular' tipom. Nakon uspesne registracije, korisnik se
+    automatski prijavljuje.
+    **Template**:
+    :template:`signup.html`
+    """
     if request.user.is_authenticated:
         return redirect('user')
 
@@ -133,6 +178,16 @@ def signup(request):
 
 
 def checkout(request):
+    """
+    Stranica za zavrsetak kupovine premium pretplate.
+
+    Nakon sto korisnik sprovede checkout proces, kreira se Purchased
+    zapis i menja se njegov tip na 'premium'.
+    **Model**:
+    :model:`app.Purchased`
+    **Template**:
+    :template:`checkout.html`
+    """
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = User.objects.get(idauth=request.user.id)
@@ -146,6 +201,19 @@ def checkout(request):
 
 
 def admin(request):
+    """
+    Admin panel za upravljanje platformom.
+
+    Admin moze da:
+    - Upravlja trending plejlistama (brisanje)
+    - Upravlja korisnicima (brisanje, promotion u moderatora, demotion)
+    - Vidi sve aktivnosti na platformi
+    - Prati statistiku (broj korisnika, plejlisti, moderatora, aktivnih pretplata)
+    - Vidi sve kupovine i njihov status
+    **Template**:
+    :template:`admin.html`
+    """
+
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
         if form_type == 'trending':
@@ -324,6 +392,15 @@ def admin(request):
 
 
 def pricing(request):
+    """
+    Stranica za prikaz cena i kupovinu premium pretplate.
+
+    Ako je korisnik vec aktivan premium korisnik (pretplata nije istekla),
+    preusmerava ga na stranicu koja ga obavestava da vec ima premium.
+    Inace ga preusmerava na checkout stranicu.
+    **Template**:
+    :template:`pricing.html`
+    """
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = User.objects.get(idauth=request.user.id)
@@ -342,10 +419,23 @@ def pricing(request):
 
 
 def successful_payment(request):
+    """
+    Stranica za potvrdu uspesne kupovine premium pretplate.
+    **Template**:
+    :template:`successful_payment.html`
+    """
     return render(request, 'successful_payment.html')
 
 
 def createCollab(request, collabid):
+    """
+    Stranica za upravljanje kolaboracijom u fazi kreiranja.
+
+    Omogucava dodavanje prijatelja u kolaboraciju (sa ogranicenjem na 3 za regular korisnike),
+    izlazak iz kolaboracije, pokretanje kolaboracije sa datim imenom
+    **Template**:
+    :template:`createCollab.html`
+    """
     user = User.objects.get(idauth=request.user)
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -436,6 +526,14 @@ def createCollab_context(user, collabid, extra=None):
 
 @login_required
 def ajax_friends_collab(request, collabid):
+    """
+    AJAX endpoint koji vraca listu prijatelja za kolaboraciju.
+
+    Vraca samo prijatelje koji nisu već ucesnici kolaboracije
+    i prikazuje da li je zahtev vec poslat.
+
+    Vraca listu prijatelja sa informacijom o slanju zahteva u obliku JsonResponse
+    """
     user = User.objects.get(idauth=request.user)
     collab = Collab.objects.get(idcollab=collabid)
     friendlist = get_friends_list(user)
@@ -462,6 +560,15 @@ def ajax_friends_collab(request, collabid):
 
 
 def moderator(request):
+    """
+    Moderator panel za upravljanje plejlistama.
+
+    Omogucava moderatoru da kreira nove playlistе, preuredjuje postojece plejliste, brise plejliste,
+    prenosi plejlistе u trending sekciju, vidi sve aktivnosti i ocene na svojim plejlistama,
+    prati prosecnu ocenu svojih plejlista.
+    **Template**:
+    :template:`moderator.html`
+    """
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
         if form_type == 'createPlaylist':
@@ -552,6 +659,13 @@ def moderator(request):
 
 
 def makePlaylist(request, id):
+    """
+    Stranica za uredjivanje/preuredjivanje plejliste.
+
+    Prikazuje sve pesme koje su dodate u playlistu i osobe koje su ih dodale.
+    **Template**:
+    :template:`collabPage.html`
+    """
     collab = Collab.objects.get(idcollab=id)
     pesme = Contains.objects.filter(idplaylist=collab.idplaylist)
     playlist = []
@@ -569,6 +683,15 @@ def makePlaylist(request, id):
 
 
 def userpage(request):
+    """
+    Korisnicka stranica za obicne korisnike (regular i premium).
+
+    Omogucava korisniku da vidi sve svoje kolaboracije, salje zahteve za prijateljstvo,
+    vidi poruke (zahtevi za prijateljstvo i kolaboracije), prihvata/odbija zahteve,
+    kreira nove kolaboracije (sa ogranicenjem na 5 za regular korisnike).
+    **Template**:
+    :template:`user.html`
+    """
     user = User.objects.get(idauth=request.user)
     collabs = Collab.objects.filter(status="created").filter(iduser=user.iduser)
     col = collabs.first()
@@ -714,12 +837,27 @@ def get_messages_list(user):
 
 
 def logoutuser(request):
+    """
+    Odjava korisnika sa aplikacije.
+
+    Brise sesiju i preusmerava korisnika na landing stranicu.
+    **Templates**:
+    :template:`index.html`
+    """
     logout(request)
     return redirect('index')
 
 
 @login_required(login_url='loginuser')
 def collabPage(request, id):
+    """
+    Stranica aktivne kolaboracije sa svim dodatim pesmama.
+
+    Prikazuje sve pesme koje su dodate u kolaboraciju, ko je dodao svaku pesmu,
+    i sve ucesnike kolaboracije.
+    **Templates**:
+    :template:`collabPage.html`
+    """
     collab = Collab.objects.get(idcollab=id)
     pesme = Contains.objects.filter(idplaylist=collab.idplaylist)
     users = []
@@ -755,6 +893,13 @@ def get_spotify_token():
 
 
 def search_spotify(request, id):
+    """
+    Pretrazuje Spotify katalog za pesme prema unetom zapisu.
+
+    Koristi Spotify Web API za pronalazenje pesama i vraca top 8 rezultata.
+    **Templates**:
+    :template:`search.html`
+    """
     query = request.GET.get("q", "")
     if not query:
         return HttpResponse("")
@@ -770,6 +915,18 @@ def search_spotify(request, id):
 
 @login_required(login_url='loginuser')
 def add_track(request, id):
+    """
+    Dodaje pesmu u plejlistu kolaboracije.
+
+    Prvo proverava ogranicenja za regular korisnike (max 10 pesama).
+    Ako pesma ne postoji u bazi, kreira novu Song instancu. Zatim
+    kreira Contains zapis koji povezuje pesmu sa plejlistom.
+    **Models**:
+    :model:`app.Song`,
+    :model:`app.Contains`
+    **Templates**:
+    :template:`collabPage.html`
+    """
     user = User.objects.get(idauth=request.user)
     pl = Collab.objects.get(idcollab=id).idplaylist
     num = Contains.objects.filter(iduser=user, idplaylist=pl).count()
@@ -806,6 +963,16 @@ def add_track(request, id):
 
 
 def remove_track(request, id, idsong):
+    """
+    Uklanja pesmu iz plejliste kolaboracije.
+
+    Brise Contains zapis koji povezuje pesmu sa plejlistom.
+    **Models**:
+    :model:`app.Song`,
+    :model:`app.Contains`
+    **Templates**:
+    :template:`collabPage.html`
+    """
     if request.method == "POST":
         playlist = Collab.objects.get(idcollab=id).idplaylist
         song = Song.objects.get(idsong=idsong)
@@ -815,6 +982,14 @@ def remove_track(request, id, idsong):
 
 
 def trending(request):
+    """
+    Prikazuje sve trending plejliste sa informacijama o likovima i ocenama.
+
+    Za svaku trending plejlistu prikazuje broj lajkova, prosecnu ocenu,
+    sliku (nasumicno izabrana iz pesama) i da li je trenutni korisnik ostavio like/ocenu.
+    **Templates**:
+    :template:`trending.html`
+    """
     cr = Created.objects.filter(trending=1)
     res = []
     for i in cr:
@@ -848,6 +1023,15 @@ def trending(request):
 
 @login_required(login_url='loginuser')
 def like(request, id):
+    """
+    Dodaje ili uklanja like sa plejliste od strane trenutnog korisnika.
+
+    Ako korisnik vec ima like, brise ga. Ako nema, kreira novi like.
+    **Models**:
+    :model:`app.Liked`,
+    **Templates**:
+    :template:`trending.html`
+    """
     if request.method == "POST":
         created = Created.objects.filter(idplaylist=id).first()
         user = User.objects.filter(idauth=request.user).first()
@@ -864,6 +1048,15 @@ def like(request, id):
 
 @login_required(login_url='loginuser')
 def rate(request, id):
+    """
+    Prikazuje formu za davanje ocene plejlisti.
+
+    Ako je POST zahtev sa rating vrednoscu, pravi ocenu (ili zamenjuje
+    postojecu). Ako je GET zahtev, prikazuje formu sa trenutnom ocenom
+    ako postoji.
+    **Templates**:
+    :template:`rate.html`
+    """
     if request.method == "POST":
         rating_string = request.POST.get('rating', '')
         if rating_string == '':
@@ -892,6 +1085,11 @@ def rate(request, id):
 
 
 def cancelrate(request, id):
+    """
+    Otkazuje/brise ocenu koju je korisnik dao plejlisti.
+    **Templates**:
+    :template:`trending.html`
+    """
     if request.method == "POST":
         created = Created.objects.filter(idplaylist=id).first()
         user = User.objects.filter(idauth=request.user).first()
@@ -990,6 +1188,13 @@ def ajax_mailbox_action(request):
 
 @login_required(login_url='loginuser')
 def already_premium(request):
+    """
+    Stranica koja obavestava korisnika da je vec premium korisnik.
+
+    Prikazuje datum kupovine, datum isteka pretplate i broj dana do isteka.
+    **Templates**:
+    :template:`already_premium.html`
+    """
     user = User.objects.get(idauth=request.user.id)
     p = Purchased.objects.filter(iduser=user)
     expiry_date = None
