@@ -1,5 +1,22 @@
 gsap.registerPlugin(ScrollTrigger);
 
+// dodavanje random slike umesto miach
+const images = [
+    "img1.jfif",
+    "img2.jpg",
+    "img3.jfif",
+    "img4.jfif",
+    "img5.jfif",
+    "img6.jfif",
+    "img7.jfif",
+    "miach.jpg",
+    "song3.jpg"
+];
+
+const i = Math.floor(Math.random() * images.length);
+const elem = document.getElementById("random-image");
+elem.src = `../static/images/${images[i]}`;
+
 // pravljenje timelinea za kretanje ploce i dohvatanje prvih vrednosti
 const getResponsiveValues = () => {
     const isMobile = window.innerWidth <= 768;
