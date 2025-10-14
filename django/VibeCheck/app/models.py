@@ -3,6 +3,12 @@ from django.contrib.auth.models import User as djangoUser
 
 
 class User(models.Model):
+    """
+    Korisnik aplikacije koji je povezan putem Django autentifikacije.
+
+    Ova klasa prosiruje Django User model sa dodatnim informacijama o tipu
+    korisnika (regular, premium, moderator, admin).
+    """
     iduser = models.AutoField(db_column='idUser', primary_key=True)
     type = models.CharField(max_length=9)
     idauth = models.OneToOneField(djangoUser, on_delete=models.CASCADE, db_column='idauth')
@@ -13,6 +19,12 @@ class User(models.Model):
 
 
 class Playlist(models.Model):
+    """
+    Predstavlja kolekciju pesama koju kreiraju korisnici.
+
+    Svaka plejlista moze sadrzati više pesama i moze biti deo kolaboracije
+    izmedju vise korisnika.
+    """
     idplaylist = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
 
@@ -22,6 +34,12 @@ class Playlist(models.Model):
 
 
 class Song(models.Model):
+    """
+    Predstavlja pesmu iz Spotify kataloga.
+
+    Sadrzi informacije o pesmi kao što su naziv, umetnik, trajanje i link
+    do slike. Svaka pesma je jedinstvena po spotify_id.
+    """
     idsong = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45)
     link = models.CharField(max_length=150)
@@ -37,6 +55,13 @@ class Song(models.Model):
 
 
 class Collab(models.Model):
+    """
+    Predstavlja kolaboraciju izmedju korisnika na zajednickoj plejlisti.
+
+    Status moze biti 'created' (u kreiranju) ili 'active' (aktivna kolaboracija).
+    Kolaboracija je povezana sa korisnikom :model:`app.User` koji je inicijator
+    i sa plejlistom :model:`app.Playlist` na kojoj se radi.
+    """
     idcollab = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     iduser = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduser')
@@ -49,6 +74,13 @@ class Collab(models.Model):
 
 
 class Requestfriendship(models.Model):
+    """
+    Predstavlja zahtev za prijateljstvo izmedju dva korisnika.
+
+    Sadrzi informacije o posiljaocu i primaocu zahteva, kao i vremenske
+    informacije kada je zahtev poslat. Svaki par korisnika :model:`app.User` moze imati samo
+    jedan aktivan zahtev buduci da postoji unique constraint.
+    """
     idrf = models.AutoField(primary_key=True)
     idusersend = models.ForeignKey(User, on_delete=models.CASCADE, db_column='idusersend', related_name='friend_requests_sent')
     iduserrecieve = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduserrecieve', related_name='friend_requests_received')
@@ -63,6 +95,12 @@ class Requestfriendship(models.Model):
 
 
 class Friendship(models.Model):
+    """
+    Predstavlja potvrdjeno prijateljstvo izmedju dva korisnika.
+
+    Kreira se nakon sto je primalac prihvatio zahtev za prijateljstvo.
+    Povezana je sa :model:`app.Requestfriendship` koji sadrzi inicijatora zahteva.
+    """
     id = models.AutoField(primary_key=True)
     request = models.ForeignKey(Requestfriendship, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -72,6 +110,12 @@ class Friendship(models.Model):
 
 
 class Requestcollab(models.Model):
+    """
+    Predstavlja zahtev za pridruzivanje kolaboraciji.
+
+    Jedan korisnik :model:`app.User` (posiljalac) poziva drugog (primalac) da se pridruzi
+    njegovoj kolaboraciji :model:`app.Collab`. Sadrzi informaciju o vremenu kada je zahtev poslat.
+    """
     idrc = models.AutoField(primary_key=True)
     idusersend = models.ForeignKey(User, on_delete=models.CASCADE, db_column='idusersend')
     iduserrecieve = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduserrecieve', related_name='requestcollab_received')
@@ -84,6 +128,13 @@ class Requestcollab(models.Model):
 
 
 class Participated(models.Model):
+    """
+    Povezuje korisnika sa kolaboracijom u kojoj je ucesnik.
+
+    Cuva informaciju o tome koji su ucesnici :model:`app.User`
+    deo odredjene kolaboracije :model:`app.Collab` i omogucava
+    pracenje ko je radio na kojoj kolaboraciji.
+    """
     id = models.AutoField(primary_key=True)
     iduser = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduser')
     idcollab = models.ForeignKey(Collab, on_delete=models.CASCADE, db_column='idcollab')
@@ -94,6 +145,14 @@ class Participated(models.Model):
 
 
 class Created(models.Model):
+    """
+    Povezuje korisnika sa plejlistom koju je kreirao.
+
+    Cuva informaciju o tome ko :model:`app.User` je
+    kreirao koju plejlistu :model:`app.Playlist`, kao i
+    trending status koji ukazuje da li je plejlista u trending sekciji.
+    Svaki par korisnik-plejlista je jedinstven.
+    """
     id = models.AutoField(primary_key=True)
     iduser = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduser')
     idplaylist = models.ForeignKey(Playlist, on_delete=models.CASCADE, db_column='idplaylist')
@@ -108,6 +167,14 @@ class Created(models.Model):
 
 
 class Contains(models.Model):
+    """
+    Povezuje pesmu sa plejlistom i cuva informaciju ko je dodao pesmu.
+
+    Omogucava pracenje koje pesme :model:`app.Song` se
+    nalaze u kojoj plejlisti :model:`app.Playlist`,
+    kao i koji korisnik :model:`app.User` je dodao tu pesmu.
+    Svaka kombinacija plejlista-pesma je jedinstvena.
+    """
     id = models.AutoField(primary_key=True)
     idplaylist = models.ForeignKey(Playlist, on_delete=models.CASCADE, db_column='idplaylist')
     idsong = models.ForeignKey(Song, on_delete=models.CASCADE, db_column='idsong')
@@ -122,6 +189,13 @@ class Contains(models.Model):
 
 
 class Liked(models.Model):
+    """
+    Korisnik moze da lajkuje plejlistu.
+
+    Cuva informaciju koji korisnici :model:`app.User` su ostavili like na
+    kojoj plejlisti :model:`app.Created`, kao i kada su to uradili.
+    Svaki korisnik moze ostaviti samo jedan like na jednoj plejlisti.
+    """
     id = models.AutoField(primary_key=True)
     created = models.ForeignKey(Created, on_delete=models.CASCADE)
     iduser = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduser')
@@ -136,6 +210,14 @@ class Liked(models.Model):
 
 
 class Rated(models.Model):
+    """
+    Korisnik moze da oceni plejlistu.
+
+    Cuva informaciju o tome koji je korisnik :model:`app.User`
+    dao koju ocenu plejlisti :model:`app.Created`, samu ocenu (rating)
+    i vreme kada je ocena data.
+    Svaki korisnik moze dati samo jednu ocenu po plejlisti (moze je azurirati).
+    """
     id = models.AutoField(primary_key=True)
     created = models.ForeignKey(Created, on_delete=models.CASCADE)
     iduser = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduser')
@@ -151,6 +233,13 @@ class Rated(models.Model):
 
 
 class Purchased(models.Model):
+    """
+    Predstavlja kupovinu premium pretplate od strane korisnika.
+
+    Cuva informaciju o tome koji korisnik :model:`app.User` je kupio
+    premium pretplatu i kada je to ucinio.
+    Koristi se za pracenje validnosti premium statusa (30 dana od kupovine).
+    """
     idpur = models.AutoField(primary_key=True)
     iduser = models.ForeignKey(User, on_delete=models.CASCADE, db_column='iduser')
     date = models.DateTimeField()
