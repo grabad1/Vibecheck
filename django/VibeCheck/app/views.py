@@ -1215,3 +1215,30 @@ def already_premium(request):
 
 def help(request):
     return render(request, "help.html")
+
+def viewPlaylist(request, id):
+    """
+    Stranica aktivne kolaboracije sa svim dodatim pesmama.
+
+    Prikazuje sve pesme koje su dodate u kolaboraciju, ko je dodao svaku pesmu,
+    i sve ucesnike kolaboracije.
+    **Templates**:
+    :template:`collabPage.html`
+    """
+    collab = Collab.objects.get(idcollab=id)
+    pesme = Contains.objects.filter(idplaylist=collab.idplaylist)
+    users = [collab.iduser]
+    playlist = []
+    for i in pesme:
+        playlist.append({
+            'song': i.idsong,
+        })
+    user = None
+    status = False
+
+    if request.user.is_authenticated:
+        user = User.objects.filter(idauth=request.user).first()
+        if user is not None and user.type not in ['admin', 'moderator']:
+            status = True
+    return render(request, 'viewPlaylist.html',
+                  {'collab': collab, 'playlist': playlist, 'count': len(playlist), 'status': status, 'users': users, 'user':user})

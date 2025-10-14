@@ -455,3 +455,31 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
+.pom{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+li a {
+    width: 150px;
+    margin: 0 auto;
+}
+.gradientt-btn {
+    font-size: 17px;
+    width: 100%;
+  background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+  font-family: "Jersey 15", sans-serif;
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
+  border: none;
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+.gradientt-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}

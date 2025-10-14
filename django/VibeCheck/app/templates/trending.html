@@ -75,7 +75,10 @@
                                 <h3>{{ r.playlist.name }}</h3>
                                 <p>By {{ r.user.idauth.username }}</p>
                               </div>
-                              <div class="playlist-actions">
+                            <div class="pom">
+                                <a href="{% url 'viewPlaylist' r.playlist.idplaylist %}"><button class="gradientt-btn">Check out!</button></a>
+
+                                </div><div class="playlist-actions">
                                   <form method="post" action="{% url 'like' r.playlist.idplaylist %}">
                                       {% csrf_token %}
                                 <button class="like-btn" type="submit" style="opacity:{% if r.liked %} 1 {% else %} 0.4 {% endif %};">❤️ {{ r.likes }}</button>

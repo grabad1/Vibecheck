@@ -33,4 +33,5 @@ urlpatterns = [
     path('ajax/friends-collab/<int:collabid>/', ajax_friends_collab, name='ajax_friends_collab'),
     path('already_premium/', already_premium, name='already_premium'),
     path('help/', help, name='help'),
+    path('viewPlaylist/<int:id>', viewPlaylist, name='viewPlaylist'),
 ]
