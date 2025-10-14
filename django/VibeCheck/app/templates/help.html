@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../static/css/help.css">
 </head>
 <body>
-    <a href="#" class="exit">&times;</a>
+    <a href="{% url 'index' %}" class="exit">&times;</a>
 
     <div class="container py-3">
         <header>
@@ -87,7 +87,7 @@
                         </h2>
                         <div id="mc1" class="accordion-collapse collapse" data-bs-parent="#managingCollabs">
                             <div class="accordion-body">
-                                From your dashboard, click on "Create New Collab" button. Give your collab a name, choose whether it's public or private, and start inviting friends! You can customize it further after creation.
+                                From your dashboard, click on "Create New Collab" button. Give your collab a name and start inviting friends! You can customize it further after creation.
                             </div>
                         </div>
                     </div>
@@ -107,26 +107,13 @@
 
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mc3">
-                                What's the difference between public and private collabs?
-                            </button>
-                        </h2>
-                        <div id="mc3" class="accordion-collapse collapse" data-bs-parent="#managingCollabs">
-                            <div class="accordion-body">
-                                Public collabs can be discovered by anyone on VibeCheck and appear in the trending section. Private collabs are only accessible to people you specifically invite - perfect for personal playlists with close friends!
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mc4">
                                 Can I remove someone from my collab?
                             </button>
                         </h2>
                         <div id="mc4" class="accordion-collapse collapse" data-bs-parent="#managingCollabs">
                             <div class="accordion-body">
-                                Yes! As the collab creator, you can manage members. Go to your collab settings, find the member you want to remove, and click the remove button next to their name.
+                                No, as soon as the collab starts, you cannot remove anyone from your collab.
                             </div>
                         </div>
                     </div>
@@ -144,7 +131,7 @@
                         </h2>
                         <div id="as1" class="accordion-collapse collapse" data-bs-parent="#addingSongs">
                             <div class="accordion-body">
-                                Open your collab and click "Add Song". You can search for songs by name, artist, or album, or paste a Spotify link directly. Each song you add will be linked to its Spotify page so everyone can listen!
+                                Open your collab and click "ADD". You can search for songs by name, artist, or album. Each song you add will be linked to its Spotify page so everyone can listen!
                             </div>
                         </div>
                     </div>
@@ -170,7 +157,7 @@
                         </h2>
                         <div id="as3" class="accordion-collapse collapse" data-bs-parent="#addingSongs">
                             <div class="accordion-body">
-                                Currently, VibeCheck only supports Spotify links. We chose Spotify because of its extensive library and easy-to-share links. Support for other platforms may come in future updates!
+                                Currently, VibeCheck only supports Spotify. We chose Spotify because of its extensive library and easy-to-share links. Support for other platforms may come in future updates!
                             </div>
                         </div>
                     </div>
@@ -183,7 +170,7 @@
                         </h2>
                         <div id="as4" class="accordion-collapse collapse" data-bs-parent="#addingSongs">
                             <div class="accordion-body">
-                                Yes! You can remove any song you added. If you're the collab creator, you can also remove songs added by other members. Just click the delete/remove icon next to the song.
+                                Yes! You can remove any song you added. If you're the collab creator, you can also remove songs added by other members. Just click the Remove icon next to the song.
                             </div>
                         </div>
                     </div>
@@ -245,6 +232,7 @@
                     </div>
                 </div>
             </section>
+
             <section class="mb-5">
                 <h2 class="section-title mb-4">Account & Settings</h2>
                 <div class="accordion" id="accountSettings">
@@ -256,20 +244,7 @@
                         </h2>
                         <div id="ac1" class="accordion-collapse collapse" data-bs-parent="#accountSettings">
                             <div class="accordion-body">
-                                Go to your account settings, click on "Security" or "Change Password", enter your current password, then your new password twice to confirm. Make sure to use a strong password!
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ac2">
-                                I forgot my password. What do I do?
-                            </button>
-                        </h2>
-                        <div id="ac2" class="accordion-collapse collapse" data-bs-parent="#accountSettings">
-                            <div class="accordion-body">
-                                Click "Forgot Password" on the login page. Enter your email address and we'll send you a link to reset your password. Check your spam folder if you don't see the email within a few minutes.
+                                In the top right corner there is a dropdown menu with your username, click on it and then click on "Change Password", enter your current password, then your new password twice to confirm. Make sure to use a strong password!
                             </div>
                         </div>
                     </div>
@@ -282,7 +257,7 @@
                         </h2>
                         <div id="ac3" class="accordion-collapse collapse" data-bs-parent="#accountSettings">
                             <div class="accordion-body">
-                                Yes! Go to your account settings and look for the "Profile" section. You can update your username there. Keep in mind that your friends will see your new username in all shared collabs.
+                                No, once you've made an account with a certain username, you cannot make changes to it.
                             </div>
                         </div>
                     </div>
@@ -290,12 +265,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ac4">
-                                How do I delete my account?
+                                How do I Log Out?
                             </button>
                         </h2>
                         <div id="ac4" class="accordion-collapse collapse" data-bs-parent="#accountSettings">
                             <div class="accordion-body">
-                                We're sad to see you go! Go to account settings and look for "Delete Account" at the bottom. This action is permanent and will delete all your collabs, songs, and data. Make sure to save anything important first!
+                               In the top right corner there is a dropdown menu with your username, click on it and then click on "Log Out". You will then return to the main page.
                             </div>
                         </div>
                     </div>
@@ -304,19 +279,6 @@
             <section class="mb-5">
                 <h2 class="section-title mb-4">Troubleshooting</h2>
                 <div class="accordion" id="troubleshooting">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tr1">
-                                My Spotify link isn't working. What's wrong?
-                            </button>
-                        </h2>
-                        <div id="tr1" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
-                            <div class="accordion-body">
-                                Make sure you're copying the full Spotify link (it should start with "https://open.spotify.com/"). The link should point directly to a track. If you're still having issues, try searching for the song by name instead of pasting a link.
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tr2">
@@ -361,7 +323,7 @@
             <section class="text-center mb-5 pb-5">
                 <h2 class="section-title mb-3">Still Need Help?</h2>
                 <p class="fs-5 text-body-secondary pixel-text">
-                    Can't find what you're looking for? Contact our support team at <a href="mailto:support@vibecheck.com">support@vibecheck.com</a>
+                    Can't find what you're looking for? Contact our support team at <a href="mailto:dulegraba03@gmail.com">support@vibecheck.com</a>
                 </p>
             </section>
         </main>
