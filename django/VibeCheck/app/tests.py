@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -24,6 +25,7 @@ class LoginTests(TestCase):
     def test_loginuser_get(self):
         res = self.client.get(reverse('loginuser'))
         self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Remember me', html=True)
 
     def test_loginuser_post_wrong_user(self):
         res = self.client.post(reverse('loginuser'), {'username': 'x', 'password': 'x'})
@@ -37,12 +39,14 @@ class LoginTests(TestCase):
 
     def test_loginuser_post_success(self):
         res = self.client.post(reverse('loginuser'), {'username': 'user', 'password': '123'})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(res.url, '/user/')
 
     def test_logoutuser(self):
         self.client.login(username='user', password='123')
-        res = self.client.get(reverse('logoutuser'), follow=True)
-        self.assertIn(res.status_code, (200, 302))
+        res = self.client.get(reverse('logoutuser'))
+        self.assertEquals(res.status_code, 302)
+        self.assertEqual(res.url, '/')
 
 
 class AdminTests(TestCase):
@@ -50,45 +54,44 @@ class AdminTests(TestCase):
         self.client = Client()
         self.admin_user = create_user('admin', '123', utype='admin')
 
-        p = Playlist.objects.create(name='p1')
         self.moderator = create_user('moderator', '123')
         self.user = create_user('user', '123')
-        created = Created.objects.create(idplaylist=p, iduser=self.moderator, trending=1)
 
     def test_admin_get(self):
         self.client.login(username='admin', password='123')
         res = self.client.get(reverse('admin'))
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'admin.html')
+        self.assertContains(res, 'Dashboard', html=True)
 
     def test_admin_post_trending_delete(self):
         self.client.login(username='admin', password='123')
-        p = Playlist.objects.create(name='p2')
+        p = Playlist.objects.create(name='p1')
         created = Created.objects.create(idplaylist=p, iduser=self.moderator, trending=1)
         res = self.client.post(reverse('admin'), {'form_type': 'trending', 'fordelete': p.idplaylist})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        self.assertEquals(Playlist.objects.all().count(), 0)
 
     def test_admin_promote(self):
         self.client.login(username='admin', password='123')
         res = self.client.post(reverse('admin'),
                                {'form_type': 'users', 'action': 'promote', 'userid': self.user.iduser})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
         u = User.objects.get(iduser=self.user.iduser)
         self.assertEqual(u.type, 'moderator')
 
     def test_admin_demote(self):
         res = self.client.post(reverse('admin'),
                                {'form_type': 'users', 'action': 'demote', 'userid': self.moderator.iduser})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
         u = User.objects.get(iduser=self.user.iduser)
         self.assertEqual(u.type, 'regular')
 
     def test_admin_remove(self):
         res = self.client.post(reverse('admin'), {'form_type': 'users', 'action': 'remove', 'userid': self.user.iduser})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
 
 
-class SignupPasswordTests(TestCase):
+class SignupTests(TestCase):
     def setUp(self):
         self.client = Client()
         djangoUser.objects.filter(username='user').delete()
@@ -96,6 +99,7 @@ class SignupPasswordTests(TestCase):
     def test_signup_get(self):
         res = self.client.get(reverse('signup'))
         self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Sign up!', html=True)
 
     def test_signup_existing_user(self):
         djangoUser.objects.create_user(username='user', password='123')
@@ -105,9 +109,13 @@ class SignupPasswordTests(TestCase):
 
     def test_signup_success(self):
         res = self.client.post(reverse('signup'), {'username': 'user', 'password': '123', 'email': 'user@gmail.com'})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(res.url, '/user/')
         self.assertTrue(djangoUser.objects.filter(username='user').exists())
         self.assertTrue(User.objects.filter(idauth__username='user').exists())
+
+
+class PasswordTests(TestCase):
 
     def test_password_change_wrong_old(self):
         user = create_user('user', '123')
@@ -126,8 +134,9 @@ class SignupPasswordTests(TestCase):
     def test_password_change_success(self):
         user = create_user('user', '123')
         self.client.login(username='user', password='123')
-        res = self.client.post(reverse('passwordChange'), {'old': '123', 'new': 'n1', 'confirm': 'n1'}, follow=True)
-        self.assertIn(res.status_code, (200, 302))
+        res = self.client.post(reverse('passwordChange'), {'old': '123', 'new': 'n1', 'confirm': 'n1'})
+        self.assertEqual(res.status_code, 302)
+        self.assertEquals(res.url, '/successful_password_change/')
         self.client.logout()
         logged = self.client.login(username='user', password='n1')
         self.assertTrue(logged)
@@ -151,7 +160,8 @@ class TracksTests(TestCase):
             'link': 'link'
         }
         res = self.client.post(reverse('add_track', args=[coll.idcollab]), post)
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('/collabPage/', res.url)
         self.assertTrue(Song.objects.filter(spotify_id='id1').exists())
         song = Song.objects.get(spotify_id='id1')
         self.assertTrue(Contains.objects.filter(idsong=song, idplaylist=coll.idplaylist).exists())
@@ -164,10 +174,80 @@ class TracksTests(TestCase):
         song = Song.objects.create(name='Song', spotify_id='id1', artist='Artist', duration=1800, link='link')
         Contains.objects.create(idsong=song, idplaylist=coll.idplaylist, iduser=self.user)
         res = self.client.post(reverse('remove_track', args=[coll.idcollab, song.idsong]))
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('/collabPage/', res.url)
         self.assertFalse(Contains.objects.filter(idsong=song, idplaylist=coll.idplaylist).exists())
         res = self.client.post(reverse('collabPage', args=[coll.idcollab]))
         self.assertNotContains(res, 'Song', html=True)
+
+    def test_add_track_twice(self):
+        coll = Collab.objects.first()
+        post = {
+            'spotify_id': 'id1',
+            'artist': 'Artist',
+            'name': 'Song',
+            'duration': '1800',
+            'link': 'link'
+        }
+        for i in range(2):
+            res = self.client.post(reverse('add_track', args=[coll.idcollab]), post)
+            self.assertEqual(res.status_code, 302)
+            self.assertIn('/collabPage/', res.url)
+
+        song = Song.objects.get(spotify_id='id1')
+        self.assertEqual(Contains.objects.filter(idsong=song, idplaylist=coll.idplaylist).count(), 1)
+        self.assertIn('collabPage', res.url)
+        res = self.client.post(reverse('collabPage', args=[coll.idcollab]))
+        self.assertContains(res, 'Song', html=True)
+
+    def test_limit_10_songs_regular(self):
+        coll = Collab.objects.first()
+        for i in range(10):
+            post = {
+                'spotify_id': 'id' + str(i),
+                'artist': 'Artist' + str(i),
+                'name': 'Song' + str(i),
+                'duration': '1800',
+                'link': 'link'
+            }
+            res = self.client.post(reverse('add_track', args=[coll.idcollab]), post)
+            self.assertEqual(res.status_code, 302)
+        self.assertEqual(Contains.objects.filter(idplaylist=coll.idplaylist).count(), 10)
+        post = {
+            'spotify_id': 'id11',
+            'artist': 'Artist11',
+            'name': 'Song11',
+            'duration': '1800',
+            'link': 'link'
+        }
+        res = self.client.post(reverse('add_track', args=[coll.idcollab]), post, follow=True)
+        self.assertContains(res, 'As a regular user, you can add a maximum of 10 songs.', html=True)
+
+    def test_unlimited_songs_premium(self):
+        self.user.type = 'premium'
+        self.user.save()
+        coll = Collab.objects.first()
+        for i in range(10):
+            post = {
+                'spotify_id': 'id' + str(i),
+                'artist': 'Artist' + str(i),
+                'name': 'Song' + str(i),
+                'duration': '1800',
+                'link': 'link'
+            }
+            res = self.client.post(reverse('add_track', args=[coll.idcollab]), post)
+            self.assertEqual(res.status_code, 302)
+        self.assertEqual(Contains.objects.filter(idplaylist=coll.idplaylist).count(), 10)
+        post = {
+            'spotify_id': 'id11',
+            'artist': 'Artist11',
+            'name': 'Song11',
+            'duration': '1800',
+            'link': 'link'
+        }
+        res = self.client.post(reverse('add_track', args=[coll.idcollab]), post, follow=True)
+        self.assertNotContains(res, 'As a regular user, you can add a maximum of 10 songs.', html=True)
+        self.assertEqual(Contains.objects.filter(idplaylist=coll.idplaylist).count(), 11)
 
 
 class TrendingTests(TestCase):
@@ -186,7 +266,7 @@ class TrendingTests(TestCase):
     def test_like(self):
         created = Created.objects.first()
         res = self.client.post(reverse('like', args=[created.idplaylist.idplaylist]))
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
         self.assertTrue(Liked.objects.filter(created=created).exists())
 
     def test_rate(self):
@@ -194,15 +274,20 @@ class TrendingTests(TestCase):
         res = self.client.get(reverse('rate', args=[created.idplaylist.idplaylist]))
         self.assertEqual(res.status_code, 200)
         res = self.client.post(reverse('rate', args=[created.idplaylist.idplaylist]), {'rating': '5'})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        res = self.client.get(reverse('trending'))
+        self.assertContains(res, '5.0', html=True)
         self.assertTrue(Rated.objects.filter(created=created).exists())
 
     def test_cancelrate(self):
         created = Created.objects.first()
         Rated.objects.create(created=created, iduser=self.user, rating=3)
         res = self.client.post(reverse('cancelrate', args=[created.idplaylist.idplaylist]))
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        res = self.client.get(reverse('trending'))
+        self.assertContains(res, 'N/A', html=True)
         self.assertFalse(Rated.objects.filter(created=created).exists())
+
 
 class ModeratorTests(TestCase):
     def setUp(self):
@@ -220,13 +305,13 @@ class ModeratorTests(TestCase):
         self.client.login(username='moderator', password='123')
         res = self.client.get(reverse('moderator'))
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'moderator.html')
+        self.assertContains(res, 'Dashboard', html=True)
 
     def test_moderator_post_trending_delete(self):
         self.client.login(username='moderator', password='123')
         res = self.client.post(reverse('moderator'),
                                {'form_type': 'myPlaylists', 'action': 'remove', 'created': self.created.id})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
         c = Created.objects.get(id=self.created.id)
         self.assertEqual(c.trending, 0)
 
@@ -234,7 +319,7 @@ class ModeratorTests(TestCase):
         self.client.login(username='moderator', password='123')
         res = self.client.post(reverse('moderator'),
                                {'form_type': 'myPlaylists', 'action': 'upload', 'created': self.created2.id})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
         c = Created.objects.get(id=self.created.id)
         self.assertEqual(c.trending, 1)
 
@@ -242,14 +327,15 @@ class ModeratorTests(TestCase):
         self.client.login(username='moderator', password='123')
         res = self.client.post(reverse('moderator'),
                                {'form_type': 'myPlaylists', 'action': 'edit', 'created': self.created2.id})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
         self.assertIn('makePlaylist', res.url)
 
     def test_moderator_create(self):
         self.client.login(username='moderator', password='123')
         res = self.client.post(reverse('moderator'), {'form_type': 'createPlaylist', 'name': 'Plejlista'})
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
         self.assertIn('makePlaylist', res.url)
+
 
 class PremiumTests(TestCase):
     def setUp(self):
@@ -259,17 +345,27 @@ class PremiumTests(TestCase):
     def test_pricing_get(self):
         res = self.client.get(reverse('pricing'))
         self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Compare plans', html=True)
 
     def test_pricing_post_redirect_authenticated(self):
         self.client.login(username='user', password='123')
         res = self.client.post(reverse('pricing'))
-        self.assertIn(res.status_code, (200, 302))
+        self.assertEqual(res.status_code, 302)
+        self.assertEquals(res.url, '/checkout/')
 
     def test_checkout_post_authenticated(self):
         self.client.login(username='user', password='123')
         res = self.client.post(reverse('checkout'))
         user = User.objects.get(idauth=self.user.idauth)
         self.assertEqual(user.type, 'premium')
+
+    def test_already_premium(self):
+        user = create_user('user1', '123', utype='premium')
+        Purchased.objects.create(iduser=user, date=datetime.now().date())
+        self.client.login(username='user1', password='123')
+        res = self.client.post(reverse('pricing'))
+        self.assertEqual(res.status_code, 302)
+        self.assertEquals(res.url, '/already_premium/')
 
 
 class CollabTests(TestCase):
@@ -279,11 +375,233 @@ class CollabTests(TestCase):
         self.client.login(username='user', password='123')
 
     def test_createCollab_get(self):
-        pl = Playlist.objects.create(name='Plejlista')
-        coll = Collab.objects.create(name='Collab', iduser=self.user, idplaylist=pl, status='created')
+        pl = Playlist.objects.create(name='')
+        coll = Collab.objects.create(name='', iduser=self.user, idplaylist=pl, status='created')
         p = Participated.objects.create(idcollab=coll, iduser=self.user)
         res = self.client.get(reverse('createCollab', args=[coll.idcollab]))
         self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'INVITE FRIENDS', html=True)
+
+    def test_start_collab_without_friends(self):
+        pl = Playlist.objects.create(name='')
+        coll = Collab.objects.create(name='', iduser=self.user, idplaylist=pl, status='created')
+        p = Participated.objects.create(idcollab=coll, iduser=self.user)
+        res = self.client.post(reverse('createCollab', args=[coll.idcollab]), {'form_type': 'start'})
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Other people have to join', html=True)
+
+    def test_max_5_collabs_regular(self):
+        for i in range(5):
+            pl = Playlist.objects.create(name='Name' + str(i))
+            coll = Collab.objects.create(name='Name' + str(i), iduser=self.user, idplaylist=pl, status='active')
+            p = Participated.objects.create(idcollab=coll, iduser=self.user)
+
+        res = self.client.post(reverse('user'), {'form_type': 'collab'})
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'As a regular user, you can have a maximum of 5 collabs', html=True)
+
+    def test_unlimited_collabs_premium(self):
+        self.user.type = 'premium'
+        self.user.save()
+        for i in range(5):
+            pl = Playlist.objects.create(name='Name' + str(i))
+            coll = Collab.objects.create(name='Name' + str(i), iduser=self.user, idplaylist=pl, status='active')
+            p = Participated.objects.create(idcollab=coll, iduser=self.user)
+
+        res = self.client.post(reverse('user'), {'form_type': 'collab'})
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('createCollab', res.url)
+
+    def test_invite_max_3_friends_regular(self):
+        pl = Playlist.objects.create(name='Name')
+        coll = Collab.objects.create(name='Name', iduser=self.user, idplaylist=pl, status='created')
+        part = Participated.objects.create(idcollab=coll, iduser=self.user)
+        for i in range(3):
+            user = create_user('user' + str(i), '123')
+            req = Requestcollab.objects.create(idcollab=coll, iduserrecieve=user, idusersend=self.user)
+        user1 = create_user('user4', '123')
+        res = self.client.post(reverse('createCollab', args=[coll.idcollab]),
+                               {'form_type': 'friends', 'friend_id': user1.iduser})
+        self.assertEqual(res.status_code, 200)
+        self.assertEquals(Requestcollab.objects.filter(idcollab=coll).count(), 3)
+        self.assertContains(res, "As a regular user, you can add a maximum of 3 people", html=True)
+
+    def test_invite_unlimited_friends_premium(self):
+        self.user.type = 'premium'
+        self.user.save()
+        pl = Playlist.objects.create(name='Name')
+        coll = Collab.objects.create(name='Name', iduser=self.user, idplaylist=pl, status='created')
+        part = Participated.objects.create(idcollab=coll, iduser=self.user)
+        for i in range(3):
+            user = create_user('user' + str(i), '123')
+            req = Requestcollab.objects.create(idcollab=coll, iduserrecieve=user, idusersend=self.user)
+        user1 = create_user('user4', '123')
+        res = self.client.post(reverse('createCollab', args=[coll.idcollab]),
+                               {'form_type': 'friends', 'friend_id': user1.iduser})
+        self.assertEqual(res.status_code, 200)
+        self.assertEquals(Requestcollab.objects.filter(idcollab=coll).count(), 4)
+        self.assertNotContains(res, "As a regular user, you can add a maximum of 3 people", html=True)
+
+    def test_start_collab_without_name(self):
+        pl = Playlist.objects.create(name='')
+        coll = Collab.objects.create(name='', iduser=self.user, idplaylist=pl, status='created')
+        user2 = create_user('user2', '123')
+        p = Participated.objects.create(idcollab=coll, iduser=self.user)
+        p1 = Participated.objects.create(idcollab=coll, iduser=user2)
+        res = self.client.post(reverse('createCollab', args=[coll.idcollab]), {'form_type': 'start'})
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'You have to enter name for the collab!', html=True)
+
+    def test_userpage_post_creates_new_collab(self):
+        res = self.client.post(reverse('user'), {'form_type': 'collab'})
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('createCollab', res.url)
+        self.assertEqual(Collab.objects.filter(iduser=self.user).count(), 1)
+        self.assertEqual(Participated.objects.filter(iduser=self.user).count(), 1)
+
+    def test_receive_collab_invite(self):
+        sender = create_user('user1', '123')
+        pl = Playlist.objects.create(name='Plejlista')
+        coll = Collab.objects.create(iduser=sender, idplaylist=pl, name='Plejlista', status='created')
+        req = Requestcollab.objects.create(idusersend=sender, iduserrecieve=self.user, idcollab=coll)
+        res = self.client.get(reverse('user'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Accept', html=True)
+
+    def test_accept_collab_post_invite_accept(self):
+        sender = create_user('user1', '123')
+        pl = Playlist.objects.create(name='Plejlista')
+        coll = Collab.objects.create(iduser=sender, idplaylist=pl, name='Plejlista', status='created')
+        req = Requestcollab.objects.create(idusersend=sender, iduserrecieve=self.user, idcollab=coll)
+        res = self.client.post(reverse('user'), {
+            'form_type': 'mailbox',
+            'mail_type': 'c',
+            'mail_id': req.idrc,
+            'action': 'accept'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, 'Accept', html=True)
+        self.assertTrue(Participated.objects.filter(idcollab=coll, iduser=self.user).exists())
+
+    def test_deny_collab_post_invite_deny(self):
+        sender = create_user('user2', '123')
+        pl = Playlist.objects.create(name='Lista')
+        coll = Collab.objects.create(iduser=sender, idplaylist=pl, name='Test collab', status='created')
+        req = Requestcollab.objects.create(idusersend=sender, iduserrecieve=self.user, idcollab=coll)
+        res = self.client.post(reverse('user'), {
+            'form_type': 'mailbox',
+            'mail_type': 'c',
+            'mail_id': req.idrc,
+            'action': 'deny'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, 'Accept', html=True)
+        self.assertFalse(Requestcollab.objects.filter(idrc=req.idrc).exists())
+
+
+class FriendshipTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = create_user('user', '123')
+        self.client.login(username='user', password='123')
+
+    def test_receive_friendship_request(self):
+        sender = create_user('user1', '123')
+        req = Requestfriendship.objects.create(idusersend=sender, iduserrecieve=self.user)
+        res = self.client.get(reverse('user'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Accept', html=True)
+
+    def test_accept_friendship_request_accept(self):
+        sender = create_user('user2', '123')
+        req = Requestfriendship.objects.create(idusersend=sender, iduserrecieve=self.user)
+        res = self.client.post(reverse('user'), {
+            'form_type': 'mailbox',
+            'mail_type': 'm',
+            'mail_id': req.idrf,
+            'action': 'accept'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, 'Accept', html=True)
+        self.assertTrue(Friendship.objects.filter(request=req).exists())
+
+    def test_deny_friendship_request_deny(self):
+        sender = create_user('user3', '123')
+        req = Requestfriendship.objects.create(idusersend=sender, iduserrecieve=self.user)
+        res = self.client.post(reverse('user'), {
+            'form_type': 'mailbox',
+            'mail_type': 'm',
+            'mail_id': req.idrf,
+            'action': 'deny'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, 'Accept', html=True)
+        self.assertFalse(Friendship.objects.filter(request=req).exists())
+        self.assertFalse(Requestfriendship.objects.filter(idrf=req.idrf).exists())
+
+    def test_send_friendship_request_success(self):
+        receiver = create_user('receiver', '123')
+
+        response = self.client.post(reverse('user'), {
+            'form_type': 'friend_request',
+            'username': 'receiver'
+        })
+        self.assertEqual(Requestfriendship.objects.count(), 1)
+        request = Requestfriendship.objects.first()
+        self.assertEqual(request.idusersend, self.user)
+        self.assertEqual(request.iduserrecieve, receiver)
+
+    def test_send_friendship_request_nonexistent_user(self):
+        response = self.client.post(reverse('user'), {
+            'form_type': 'friend_request',
+            'username': 'nonexistent'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'User does not exist')
+        self.assertEqual(Requestfriendship.objects.count(), 0)
+
+    def test_send_friendship_request_to_yourself(self):
+        response = self.client.post(reverse('user'), {
+            'form_type': 'friend_request',
+            'username': 'user'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "You cannot send request to yourself!")
+        self.assertEqual(Requestfriendship.objects.count(), 0)
+
+    def test_send_friendship_request_to_moderator(self):
+        moderator = create_user('moderator', '123', utype='moderator')
+        response = self.client.post(reverse('user'), {
+            'form_type': 'friend_request',
+            'username': 'moderator'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'User does not exist')
+        self.assertEqual(Requestfriendship.objects.count(), 0)
+
+    def test_send_friendship_request_to_admin(self):
+        admin = create_user('admin', '123', utype='admin')
+        response = self.client.post(reverse('user'), {
+            'form_type': 'friend_request',
+            'username': 'admin'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'User does not exist')
+        self.assertEqual(Requestfriendship.objects.count(), 0)
+
+    def test_send_duplicate_friendship_request(self):
+        receiver = create_user('receiver', '123')
+        self.client.post(reverse('user'), {
+            'form_type': 'friend_request',
+            'username': 'receiver'
+        })
+        response = self.client.post(reverse('user'), {
+            'form_type': 'friend_request',
+            'username': 'receiver'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Request already sent')
+        self.assertEqual(Requestfriendship.objects.count(), 1)
 
 
 class FunctionalTestCase(StaticLiveServerTestCase):
@@ -548,6 +866,37 @@ class CollabPageFunctionalTestCase(FunctionalTestCase):
 
         self.assertIn('Zdravko Čolić', self.browser.page_source)
 
+    def test_remove_song(self):
+        user1, user2, _ = self.create_test_users()
+
+        req = Requestfriendship.objects.create(idusersend=user1, iduserrecieve=user2)
+        Friendship.objects.create(request=req)
+
+        playlist = Playlist.objects.create(name='Plejlista')
+        collab = Collab.objects.create(
+            iduser=user1,
+            idplaylist=playlist,
+            status='active',
+            name='Plejlista'
+        )
+        Participated.objects.create(iduser=user1, idcollab=collab)
+        Participated.objects.create(iduser=user2, idcollab=collab)
+
+        self.login_user('dusan', '123')
+
+        self.browser.get(f'{self.appUrl}/collabPage/{collab.idcollab}')
+        time.sleep(2)
+
+        searchsong = self.browser.find_element(By.ID, 'search-input')
+        searchsong.send_keys('Juznjaci')
+        time.sleep(2)
+        submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+        submit_btn.click()
+        time.sleep(2)
+        submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+        submit_btn.click()
+        self.assertNotIn('Juznjaci', self.browser.page_source)
+
     def test_add_song(self):
         user1, user2, _ = self.create_test_users()
 
@@ -593,6 +942,18 @@ class PremiumFunctionalTestCase(FunctionalTestCase):
         submit_btn.click()
         time.sleep(5)
         self.assertIn('required', self.browser.page_source)
+
+    def test_buy_premium_already_bought(self):
+        user1, _, _ = self.create_test_users()
+        Purchased.objects.create(iduser=user1, date=datetime.now().date())
+        self.login_user('dusan', '123')
+        self.browser.get(f'{self.appUrl}/pricing/')
+        start = self.browser.find_element(By.CLASS_NAME, 'start')
+        self.browser.execute_script("arguments[0].scrollIntoView(true);", start)
+        time.sleep(3)
+        start.click()
+        time.sleep(3)
+        self.assertIn('already_premium', self.browser.current_url)
 
 
 class AdminFunctionalTestCase(FunctionalTestCase):
@@ -643,6 +1004,7 @@ class AdminFunctionalTestCase(FunctionalTestCase):
         submit_btn = self.browser.find_element(By.CSS_SELECTOR, 'button[value="remove"]')
         submit_btn.click()
         time.sleep(2)
+
 
 class CreateCollabFunctionalTestCase(FunctionalTestCase):
 
@@ -869,6 +1231,7 @@ class CreateCollabFunctionalTestCase(FunctionalTestCase):
         time.sleep(2)
 
         self.assertIn('maximum of 5 collabs', self.browser.page_source)
+
 
 class TrendingFunctionalTestCase(FunctionalTestCase):
 

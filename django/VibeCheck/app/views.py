@@ -630,7 +630,7 @@ def moderator(request):
         if len(ratings) > 0:
             total_rating_sum += sum(ratings)
             cnt += len(ratings)
-            rating = round(total_rating_sum / cnt, 2)
+            rating = round(sum(ratings) / len(ratings), 2)
         if c.trending == 1:
             trending.append({
                 'created': c,
