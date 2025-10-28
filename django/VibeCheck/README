@@ -1,0 +1,10 @@
+1st Create database using bazavibecheck/full_scheme.sql. 
+2nd Optional: You can insert data from bazavibecheck/baza_sa_podacima
+3rd: Open django/Vibecheck in your Python environment
+4th: In django/Vibecheck/Vibecheck/settings.py you need connect to your database by changing info in DATABASES={ default:...}
+5th: You need to install all the modules that are used, (first install pip if you don't have it) then run:
+  pip install requests
+  pip install selenium
+  pip install mysqlclient (if you use MySQL database, if not terminal will tell you which one is needed)
+6th: In terminal run:
+  python manage.py runserver
